@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Shop Application | AMWAJ ALMSELA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap 4 + Font Awesome (matching the reference) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+    <style>
+        /* ----- GLOBAL RESET & THEME VARIABLES (matches reference) ----- */
+        :root {
+            --base: #1b7fed;
+            --base-2: #000000;
+            --bg-light: #f8fafc;
+            --border-light: #e2e8f0;
+            --card-border: #edf2f7;
+            --text-dark: #1a1a2e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Titillium Web', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ----- UTILITY ----- */
+        .text-accent {
+            color: var(--base) !important;
+        }
+
+        .bg-accent-soft {
+            background: #1b7fed10;
+        }
+
+        .border-accent {
+            border-color: var(--base) !important;
+        }
+
+        .btn--primary {
+            color: #fff;
+            background-color: var(--base) !important;
+            border-color: var(--base) !important;
+        }
+
+        .btn--primary:hover {
+            background-color: #1669d6 !important;
+            border-color: #1669d6 !important;
+        }
+
+        .btn-outline-accent {
+            color: var(--base);
+            border-color: var(--base);
+        }
+
+        .btn-outline-accent:hover {
+            color: #fff;
+            background-color: var(--base);
+            border-color: var(--base);
+        }
+
+        .form-control:focus {
+            border-color: var(--base);
+            box-shadow: 0 0 0 0.2rem rgba(27, 127, 237, 0.25);
+        }
+
+        .custom-control-input:checked~.custom-control-label::before {
+            background-color: var(--base);
+            border-color: var(--base);
+        }
+
+        .custom-control-input:focus~.custom-control-label::before {
+            box-shadow: 0 0 0 0.2rem rgba(27, 127, 237, 0.25);
+        }
+
+        a {
+            color: var(--base);
+        }
+
+        a:hover {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        /* ----- CARD STYLING (matches reference) ----- */
+        .card-apply {
+            border: 1px solid var(--card-border) !important;
+            border-radius: 8px !important;
+            background: #ffffff;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .card-apply .card-header-custom {
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-apply .card-header-custom i {
+            font-size: 22px;
+            color: #6c757d;
+            margin-right: 10px;
+        }
+
+        .card-apply .card-header-custom h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* ----- IMAGE UPLOAD BOXES ----- */
+        .upload-box {
+            width: 150px;
+            height: 150px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .upload-box:hover {
+            border-color: var(--base);
+        }
+
+        .upload-box.small {
+            width: 130px;
+            height: 130px;
+        }
+
+        .upload-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .upload-box .upload-icon {
+            font-size: 48px;
+            color: #adb5bd;
+        }
+
+        .upload-box.small .upload-icon {
+            font-size: 36px;
+        }
+
+        .upload-box .upload-icon.d-none {
+            display: none !important;
+        }
+
+        /* ----- CAPTCHA BADGE ----- */
+        .captcha-badge {
+            background: #e0e7ff;
+            color: #4338ca;
+            height: 48px;
+            width: 140px;
+            font-size: 24px;
+            font-style: italic;
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #c7d2fe;
+            border-radius: 4px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ----- RESPONSIVE TWEAKS ----- */
+        @media (max-width: 576px) {
+            .upload-box {
+                width: 120px;
+                height: 120px;
+            }
+
+            .upload-box.small {
+                width: 100px;
+                height: 100px;
+            }
+
+            .captcha-badge {
+                width: 110px;
+                font-size: 20px;
+            }
+        }
+
+        /* small text hint */
+        .hint-text {
+            font-size: 12px;
+            color: #dc3545;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* ----- PAGE TITLE ----- */
+        .page-title {
+            font-size: 32px;
+            font-weight: 400;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* ----- FOOTER MINI (matches reference footer style) ----- */
+        .footer-mini {
+            background: #1b7fed10;
+            padding: 20px 0;
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+
+        .footer-mini a {
+            color: var(--base);
+            font-weight: 600;
+        }
+
+        .footer-mini a:hover {
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container py-5">
+        <h1 class="page-title">Shop Application</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-11">
+
+                <form id="seller-apply-form" onsubmit="handleApplySubmit(event)" enctype="multipart/form-data">
+
+                    <!-- ============================================ -->
+                    <!-- CARD 1 : SELLER INFO                          -->
+                    <!-- ============================================ -->
+                    <div class="card card-apply mb-5 p-4">
+
+                        <div class="card-header-custom">
+                            <i class="fa fa-user-circle"></i>
+                            <h2>Seller Info</h2>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="first_name" placeholder="First name"
+                                    required style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="last_name" placeholder="Last name"
+                                    required style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="email" class="form-control" name="email" placeholder="Email address"
+                                    required style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="hint-text">( * Country code is must like for BD 880 )</span>
+                                <input type="tel" class="form-control" name="phone" placeholder="Phone number" required
+                                    style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="password" class="form-control" name="password" id="apply-pass"
+                                    placeholder="Password" required
+                                    style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="password" class="form-control" name="repeat_password"
+                                    id="apply-repeat-pass" placeholder="Repeat password" required
+                                    style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                        </div>
+
+                        <!-- Upload image -->
+                        <div class="d-flex flex-column align-items-center mt-3">
+                            <div class="upload-box" onclick="document.getElementById('seller-image-file').click();">
+                                <img id="seller-image-preview" src="" alt="Preview" />
+                                <i id="seller-image-icon" class="fa fa-picture-o upload-icon"></i>
+                            </div>
+                            <div class="input-group mt-3" style="max-width:480px; width:100%;">
+                                <input type="text" class="form-control" id="seller-image-name"
+                                    placeholder="Upload image" readonly
+                                    style="height:44px; border-color:var(--border-light); font-size:14px;">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary px-4" type="button"
+                                        onclick="document.getElementById('seller-image-file').click();"
+                                        style="border-color:var(--border-light); font-size:14px; font-weight:bold; background:#f8fafc;">
+                                        Browse
+                                    </button>
+                                </div>
+                                <input type="file" id="seller-image-file" name="seller_image" accept="image/*"
+                                    style="display:none;"
+                                    onchange="handleFileChange(this, 'seller-image-preview', 'seller-image-icon', 'seller-image-name')">
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- end card 1 -->
+
+
+                    <!-- ============================================ -->
+                    <!-- CARD 2 : SHOP INFO                            -->
+                    <!-- ============================================ -->
+                    <div class="card card-apply mb-5 p-4">
+
+                        <div class="card-header-custom">
+                            <i class="fa fa-home"></i>
+                            <h2>Shop Info</h2>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="shop_name" placeholder="Shop name"
+                                    required style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="shop_address" placeholder="Shop address"
+                                    required style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                        </div>
+
+                        <!-- Logo & Banner uploads -->
+                        <div class="row mt-3 justify-content-center">
+
+                            <!-- Logo -->
+                            <div class="col-md-5 col-sm-6 mb-4 d-flex flex-column align-items-center">
+                                <div class="upload-box small"
+                                    onclick="document.getElementById('shop-logo-file').click();">
+                                    <img id="shop-logo-preview" src="" alt="Logo preview" />
+                                    <i id="shop-logo-icon" class="fa fa-picture-o upload-icon"></i>
+                                </div>
+                                <div class="input-group w-100 mt-2">
+                                    <input type="text" class="form-control" id="shop-logo-name"
+                                        placeholder="Upload logo" readonly
+                                        style="height:40px; border-color:var(--border-light); font-size:13px;">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary px-3" type="button"
+                                            onclick="document.getElementById('shop-logo-file').click();"
+                                            style="border-color:var(--border-light); font-size:13px; font-weight:bold; background:#f8fafc;">
+                                            Browse
+                                        </button>
+                                    </div>
+                                    <input type="file" id="shop-logo-file" name="shop_logo" accept="image/*"
+                                        style="display:none;"
+                                        onchange="handleFileChange(this, 'shop-logo-preview', 'shop-logo-icon', 'shop-logo-name')">
+                                </div>
+                            </div>
+
+                            <!-- Banner -->
+                            <div class="col-md-5 col-sm-6 mb-4 d-flex flex-column align-items-center">
+                                <div class="upload-box small"
+                                    onclick="document.getElementById('shop-banner-file').click();">
+                                    <img id="shop-banner-preview" src="" alt="Banner preview" />
+                                    <i id="shop-banner-icon" class="fa fa-picture-o upload-icon"></i>
+                                </div>
+                                <div class="input-group w-100 mt-2">
+                                    <input type="text" class="form-control" id="shop-banner-name"
+                                        placeholder="Upload Banner" readonly
+                                        style="height:40px; border-color:var(--border-light); font-size:13px;">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary px-3" type="button"
+                                            onclick="document.getElementById('shop-banner-file').click();"
+                                            style="border-color:var(--border-light); font-size:13px; font-weight:bold; background:#f8fafc;">
+                                            Browse
+                                        </button>
+                                    </div>
+                                    <input type="file" id="shop-banner-file" name="shop_banner" accept="image/*"
+                                        style="display:none;"
+                                        onchange="handleFileChange(this, 'shop-banner-preview', 'shop-banner-icon', 'shop-banner-name')">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Captcha -->
+                        <div class="row align-items-center justify-content-center mt-3 mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <input type="text" class="form-control" name="captcha_input" id="captcha-input"
+                                    placeholder="Enter captcha value" required
+                                    style="height:48px; border-color:var(--border-light); font-size:15px;">
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                                <div id="captcha-badge" class="captcha-badge mr-3">wIol</div>
+                                <button type="button" class="btn btn-outline-secondary border-0 p-2"
+                                    onclick="refreshCaptcha()" style="background:transparent;">
+                                    <i class="fa fa-refresh text-muted" style="font-size:20px;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="form-group mb-4">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="terms-agree" required>
+                                <label class="custom-control-label text-dark small" for="terms-agree"
+                                    style="font-size:14px; user-select:none; cursor:pointer;">
+                                    I agree to Your terms
+                                    <a href="#" class="text-primary font-weight-bold text-decoration-none">Terms and
+                                        conditions</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn--primary btn-block font-weight-bold py-3 mt-3"
+                            style="font-size:18px; border-radius:4px;">
+                            Apply Shop
+                        </button>
+
+                        <div class="text-center mt-4">
+                            <span class="text-muted small">
+                                Already have an account
+                                <a href="/seller/auth/login"
+                                    class="text-primary font-weight-bold text-decoration-none">login.</a>
+                            </span>
+                        </div>
+
+                    </div>
+                    <!-- end card 2 -->
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+   <footer class="page-footer font-small mdb-color rtl">
+            <!-- Footer Links -->
+            <div class="pt-4" style="background:#1b7fed20;">
+                <div class="container text-center __pb-13px">
+
+                    <!-- Footer links -->
+                    <div class="row text-center text-md-left mt-3 pb-3 ">
+                        <!-- Grid column -->
+                        <div class="col-md-3 footer-web-logo">
+                            <a class="d-block" href="/">
+                                <img class="" src="images/2026-05-25-6a143bad95f46.webp"
+                                    onerror="this.src='images/image-place-holder.png'" alt="AMWAJ ALMSELA" />
+                            </a>
+
+
+                            <div class="mt-4 pt-lg-4">
+                                <h6 class="text-uppercase font-weight-bold footer-heder align-items-center">
+                                    Download our app
+                                </h6>
+                            </div>
+
+
+
+                            <div class="store-contents d-flex justify-content-center pr-lg-4">
+                                <div class="mr-2 mb-2">
+                                    <a class=""
+                                        href="https://www.target.com/s/apple+store++now?ref=tgt_adv_XS000000&amp;AFID=msn&amp;fndsrc=tgtao&amp;DFA=71700000012505188&amp;CPNG=Electronics_Portable+Computers&amp;adgroup=Portable+Computers&amp;LID=700000001176246&amp;LNM=apple+store+near+me+now&amp;MT=b&amp;network=s&amp;device=c&amp;location=12&amp;targetid=kwd-81913773633608:loc-12&amp;ds_rl=1246978&amp;ds_rl=1248099&amp;gclsrc=ds"
+                                        role="button">
+                                        <img width="100" src="images/apple_app.png" alt="">
+                                    </a>
+                                </div>
+
+                                <div class="mr-2 mb-2">
+                                    <a href="https://play.google.com/store?hl=en_US&amp;gl=US" role="button">
+                                        <img width="100" src="images/google_app.png" alt="">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+
+                                <div class="col-md-3 footer-padding-bottom">
+                                    <h6 class="text-uppercase mb-4 font-weight-bold footer-heder">Special</h6>
+                                    <ul class="widget-list __pb-10px">
+                                        <li class="widget-list-item"><a class="widget-list-link"
+                                                href="products.html?data_from=featured&amp;page=1">Featured
+                                                Products</a>
+                                        </li>
+                                        <li class="widget-list-item"><a class="widget-list-link"
+                                                href="products.html?data_from=latest&amp;page=1">Latest
+                                                Products</a>
+                                        </li>
+                                        <li class="widget-list-item"><a class="widget-list-link"
+                                                href="products.html?data_from=best-selling&amp;page=1">Best
+                                                Selling Products</a>
+                                        </li>
+                                        <li class="widget-list-item"><a class="widget-list-link"
+                                                href="products.html?data_from=top-rated&amp;page=1">Top
+                                                Rated Products</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                                <div class="col-md-4 footer-padding-bottom" style="">
+                                    <h6 class="text-uppercase mb-4 font-weight-bold footer-heder">Account &amp; shipping
+                                        info</h6>
+                                    <ul class="widget-list __pb-10px">
+                                        <li class="widget-list-item">
+                                            <a class="widget-list-link" href="customer/auth/login">Profile Info</a>
+                                        </li>
+                                        <li class="widget-list-item">
+                                            <a class="widget-list-link" href="customer/auth/login">Wish List</a>
+                                        </li>
+
+                                        <li class="widget-list-item">
+                                            <a class="widget-list-link" href="track-order">Track Order</a>
+                                        </li>
+
+                                        <li class="widget-list-item">
+                                            <a class="widget-list-link" href="refund-policy">Refund policy</a>
+                                        </li>
+
+                                        <li class="widget-list-item">
+                                            <a class="widget-list-link" href="return-policy">Return policy</a>
+                                        </li>
+
+                                        <li class="widget-list-item">
+                                            <a class="widget-list-link" href="cancellation-policy">Cancellation
+                                                policy</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5 footer-padding-bottom">
+                                    <div class="mb-2">
+                                        <h6 class="text-uppercase mb-4 font-weight-bold footer-heder">Newsletter</h6>
+                                        <span>Subscribe to our new channel to get latest updates</span>
+                                    </div>
+                                    <div class="text-nowrap mb-4 position-relative">
+                                        <form action="subscription" method="post">
+                                            <input type="hidden" name="_token"
+                                                value="Cty3VOzfErUIjQPahqzNB52BE4ZMnxraETp1PuX0"> <input type="email"
+                                                name="subscription_email" class="form-control subscribe-border"
+                                                placeholder="Your Email Address" required
+                                                style="padding: 11px;text-align: left;">
+                                            <button class="subscribe-button" type="submit">
+                                                Subscribe
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4 ">
+                                <div class="col-md-7">
+                                    <div
+                                        class="row d-flex align-items-center mobile-view-center-align  justify-content-center justify-content-md-startr">
+                                        <div style="">
+                                            <span class="mb-4 font-weight-bold footer-heder">Start a conversation</span>
+                                        </div>
+                                        <div class="flex-grow-1 d-none d-md-block mx-sm-4">
+                                            <hr class="start_address_under_line" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 start_address ">
+                                            <div class="">
+                                                <a class="widget-list-link" href="tel: +974 44507311 +974 55576933">
+                                                    <span class="">
+                                                        <i class="fa fa-phone m-2"></i>+974 44507311 +974 55576933
+                                                    </span>
+                                                </a>
+
+                                            </div>
+                                            <div>
+                                                <a class="widget-list-link" href="mailto: support@amwajalmsela.shop">
+                                                    <span><i class="fa fa-envelope m-2"></i> support@amwajalmsela.shop
+                                                    </span>
+                                                </a>
+                                            </div>
+                                            <div>
+                                                <a class="widget-list-link" href="auth/login">
+                                                    <span><i class="fa fa-user-o m-2"></i> Support Ticket </span>
+                                                </a><br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 ">
+                                    <div
+                                        class="row pl-2 d-flex align-items-center mobile-view-center-align justify-content-center justify-content-md-start">
+                                        <div>
+                                            <span class="mb-4 font-weight-bold footer-heder">Address</span>
+                                        </div>
+                                        <div class="flex-grow-1 d-none d-md-block ml-3">
+                                            <hr class="address_under_line" />
+                                        </div>
+                                    </div>
+                                    <div class="pl-2">
+                                        <span
+                                            class="__text-14px d-flex align-items-sm-center flex-column flex-sm-row justify-content-center">
+                                            <i class="fa fa-map-marker m-2"></i>
+                                            <span>Doha Qatar</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Footer links -->
+                </div>
+            </div>
+
+
+            <!-- Grid row -->
+            <div style="background: rgba(255, 255, 255, 0.05);">
+                <div class="container">
+                    <div class="d-flex flex-wrap end-footer footer-end last-footer-content-align">
+                        <div class="mt-3">
+                            <p class="text-left __text-16px">Copyright © 2026 Amwaj Almsela. All Rights Reserved.</p>
+                        </div>
+                        <div class="max-sm-100 justify-content-center d-flex flex-wrap mt-md-3 mt-0 mb-md-3 text-left">
+                            <span class="social-media ">
+                                <a class="social-btn text-white sb-light sb-twitter mr-2 mb-2 d-flex justify-content-center align-items-center"
+                                    target="_blank"
+                                    href="https://www.w3schools.com/howto/howto_css_table_responsive.asp">
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16"
+                                        viewBox="0 0 24 24">
+                                        <g opacity=".3">
+                                            <polygon fill="#fff" fill-rule="evenodd"
+                                                points="16.002,19 6.208,5 8.255,5 18.035,19" clip-rule="evenodd">
+                                            </polygon>
+                                            <polygon points="8.776,4 4.288,4 15.481,20 19.953,20 8.776,4"></polygon>
+                                        </g>
+                                        <polygon fill-rule="evenodd" points="10.13,12.36 11.32,14.04 5.38,21 2.74,21"
+                                            clip-rule="evenodd"></polygon>
+                                        <polygon fill-rule="evenodd" points="20.74,3 13.78,11.16 12.6,9.47 18.14,3"
+                                            clip-rule="evenodd"></polygon>
+                                        <path
+                                            d="M8.255,5l9.779,14h-2.032L6.208,5H8.255 M9.298,3h-6.93l12.593,18h6.91L9.298,3L9.298,3z"
+                                            fill="currentColor"></path>
+                                    </svg>
+                                </a>
+                            </span>
+                            <span class="social-media ">
+                                <a class="social-btn text-white sb-light sb-linkedin mr-2 mb-2" target="_blank"
+                                    href="https://dev.6amtech.com/">
+                                    <i class="fa fa-linkedin" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            <span class="social-media ">
+                                <a class="social-btn text-white sb-light sb-google-plus mr-2 mb-2" target="_blank"
+                                    href="https://dev.6amtech.com/">
+                                    <i class="fa fa-google-plus-square" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            <span class="social-media ">
+                                <a class="social-btn text-white sb-light sb-pinterest mr-2 mb-2" target="_blank"
+                                    href="https://dev.6amtech.com/">
+                                    <i class="fa fa-pinterest" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            <span class="social-media ">
+                                <a class="social-btn text-white sb-light sb-instagram mr-2 mb-2" target="_blank"
+                                    href="https://dev.6amtech.com/">
+                                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            <span class="social-media ">
+                                <a class="social-btn text-white sb-light sb-facebook mr-2 mb-2" target="_blank"
+                                    href="facebook.com">
+                                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="d-flex __text-14px">
+                            <div class="mr-3">
+                                <a class="widget-list-link" href="terms">Terms &amp;
+                                    Conditions</a>
+                            </div>
+                            <div>
+                                <a class="widget-list-link" href="privacy-policy">
+                                    Privacy Policy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Grid row -->
+            </div>
+            <!-- Footer Links -->
+
+            <!-- Cookie Settings -->
+        </footer>
+
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS                                      -->
+    <!-- ============================================ -->
+    <script>
+        /**
+         * File upload helper – shows preview and updates filename input.
+         */
+        function handleFileChange(input, previewId, iconId, textId) {
+            const preview = document.getElementById(previewId);
+            const icon = document.getElementById(iconId);
+            const nameInput = document.getElementById(textId);
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                nameInput.value = file.name;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    icon.classList.add('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                nameInput.value = '';
+                preview.src = '';
+                preview.style.display = 'none';
+                icon.classList.remove('d-none');
+            }
+        }
+
+        /**
+         * Captcha generator – 4 random alphanumeric chars.
+         */
+        function generateRandomCaptcha() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let captcha = '';
+            for (let i = 0; i < 4; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return captcha;
+        }
+
+        function refreshCaptcha() {
+            const captcha = generateRandomCaptcha();
+            document.getElementById('captcha-badge').innerText = captcha;
+        }
+
+        /**
+         * Form submit handler – validates password match & captcha.
+         */
+        function handleApplySubmit(e) {
+            e.preventDefault();
+
+            const pass = document.getElementById('apply-pass').value;
+            const repeatPass = document.getElementById('apply-repeat-pass').value;
+
+            if (pass !== repeatPass) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const captchaInput = document.getElementById('captcha-input').value.trim();
+            const captchaText = document.getElementById('captcha-badge').innerText.trim();
+
+            if (captchaInput.toLowerCase() !== captchaText.toLowerCase()) {
+                alert('Captcha value is incorrect!');
+                return;
+            }
+
+            // All good – simulate submission
+            alert('Your shop application has been submitted successfully!');
+            // In a real app you would POST the form data here.
+            // window.location.href = '/home';
+        }
+
+        /**
+         * Init: generate initial captcha on page load.
+         */
+        document.addEventListener('DOMContentLoaded', function () {
+            refreshCaptcha();
+        });
+    </script>
+
+    <!-- Bootstrap JS (optional, for better interaction) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+</body>
+
+</html>

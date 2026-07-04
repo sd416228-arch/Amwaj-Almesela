@@ -1009,13 +1009,53 @@
             <aside class="col-lg-3 d-none d-lg-block">
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body">
-                        <h3 class="h6 border-bottom pb-2 mb-3">Categories</h3>
-                        <ul class="list-unstyled" id="local-categories-list">
-                            <!-- Categories will be injected dynamically -->
-                            <div class="text-center py-3">
-                                <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                        <!-- Filter Section -->
+                        <div class="mb-4">
+                            <h3 class="h6 border-bottom pb-2 mb-3 text-center font-weight-bold">Filter</h3>
+                            <select class="form-control" id="sidebar-filter-select" style="border-color: #dce8f7;">
+                                <option value="">Choose</option>
+                                <option value="featured">Featured</option>
+                                <option value="latest">Latest</option>
+                                <option value="best-selling">Best Selling</option>
+                                <option value="top-rated">Top Rated</option>
+                            </select>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="mb-4">
+                            <h3 class="h6 border-bottom pb-2 mb-3 text-center font-weight-bold">Price</h3>
+                            <div class="d-flex align-items-center">
+                                <input type="number" class="form-control text-center" id="price-min" placeholder="0" style="border-color: #dce8f7; border-radius: 4px; padding: 4px;">
+                                <span class="mx-2 text-muted small">To</span>
+                                <input type="number" class="form-control text-center" id="price-max" placeholder="100" style="border-color: #dce8f7; border-radius: 4px; padding: 4px;">
+                                <button class="btn btn-primary ml-2 px-3 d-flex align-items-center justify-content-center" id="price-filter-btn" style="height: 38px; border-radius: 4px;">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
                             </div>
-                        </ul>
+                        </div>
+
+                        <!-- Brands Section -->
+                        <div class="mb-4">
+                            <h3 class="h6 border-bottom pb-2 mb-3 text-center font-weight-bold">Brands</h3>
+                            <div class="position-relative mb-3">
+                                <input type="text" class="form-control pr-4" id="brand-search" placeholder="Search by brands" style="border-color: #dce8f7; border-radius: 4px;">
+                                <i class="fa fa-search position-absolute text-muted" style="right: 12px; top: 12px; font-size: 14px;"></i>
+                            </div>
+                            <div id="sidebar-brands-list" style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
+                                <!-- Brands will be loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Categories Section -->
+                        <div class="mb-0">
+                            <h3 class="h6 border-bottom pb-2 mb-3 text-center font-weight-bold">Categories</h3>
+                            <ul class="list-unstyled" id="local-categories-list">
+                                <!-- Categories will be injected dynamically -->
+                                <div class="text-center py-3">
+                                    <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                                </div>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -2811,6 +2851,7 @@
 
     <!-- Local Cart, Wishlist & Quickview Mock System -->
     <script src="js/local-cart-wishlist.js"></script>
+    <script src="js/product-data.js"></script>
     <script src="js/products-page.js"></script>
 
 </body>

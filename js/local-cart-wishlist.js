@@ -4,11 +4,45 @@
 (function() {
     window.localProducts = [];
 
+    function normalizeProduct(p) {
+        if (!p) return p;
+        var brandStr = '';
+        if (p.brand) {
+            if (typeof p.brand === 'string') {
+                brandStr = p.brand;
+            } else if (typeof p.brand === 'object' && p.brand.name) {
+                brandStr = p.brand.name;
+            }
+        }
+        var imageStr = p.image || '';
+        if (!imageStr && p.images && p.images.length > 0) {
+            var primary = null;
+            for (var i = 0; i < p.images.length; i++) {
+                if (p.images[i].is_primary) {
+                    primary = p.images[i];
+                    break;
+                }
+            }
+            imageStr = primary ? primary.url : p.images[0].url;
+        }
+        var priceStr = p.price;
+        if (typeof p.price === 'number') {
+            priceStr = 'QAR' + p.price.toFixed(2);
+        } else if (typeof p.price === 'string' && !p.price.startsWith('QAR')) {
+            priceStr = 'QAR' + p.price;
+        }
+        return Object.assign({}, p, {
+            brand: brandStr,
+            image: imageStr,
+            price: priceStr
+        });
+    }
+
     // Load products database on start from backend API
     fetch('http://localhost:5000/api/v1/products?limit=100')
         .then(res => res.json())
         .then(res => {
-            window.localProducts = res.data;
+            window.localProducts = (res.data || []).map(normalizeProduct);
             updateNavCart();
             updateWishlistBadges();
         })
@@ -18,7 +52,7 @@
             fetch('data/products.json')
                 .then(r => r.json())
                 .then(d => {
-                    window.localProducts = d;
+                    window.localProducts = (d || []).map(normalizeProduct);
                     updateNavCart();
                     updateWishlistBadges();
                 });
@@ -47,7 +81,7 @@
     // Add to cart
     window.addToCartLocal = function(productId, qty) {
         const cart = getCart();
-        const existing = cart.find(item => item.id === productId);
+        const existing = cart.find(item => String(item.id) === String(productId));
         if (existing) {
             existing.qty += qty;
         } else {
@@ -57,7 +91,7 @@
         
         // Trigger Toastr success notification if library is loaded
         if (window.toastr) {
-            const prod = window.localProducts.find(p => p.id === productId);
+            const prod = window.localProducts.find(p => String(p.id) === String(productId));
             const name = prod ? prod.name : "Product";
             toastr.success(`${name} added to cart!`, 'Cart', {
                 CloseButton: true,
@@ -69,7 +103,7 @@
     // Remove from cart
     window.removeFromCartLocal = function(productId) {
         let cart = getCart();
-        cart = cart.filter(item => item.id !== productId);
+        cart = cart.filter(item => String(item.id) !== String(productId));
         saveCart(cart);
         
         if (window.toastr) {
@@ -117,7 +151,7 @@
     // Wishlist functions
     window.addWishlist = function(productId, modalId) {
         const wishlist = getWishlist();
-        if (wishlist.includes(productId)) {
+        if (wishlist.map(String).includes(String(productId))) {
             // Remove it (toggle behavior)
             window.removeWishlist(productId, modalId);
             return;
@@ -134,7 +168,7 @@
 
     window.removeWishlist = function(productId, modalId) {
         let wishlist = getWishlist();
-        wishlist = wishlist.filter(id => id !== productId);
+        wishlist = wishlist.filter(id => String(id) !== String(productId));
         saveWishlist(wishlist);
         
         // Update wishlist icons on page
@@ -156,7 +190,7 @@
         const renderedItems = [];
         
         cart.forEach(item => {
-            const prod = window.localProducts.find(p => p.id === item.id || p.slug.endsWith(item.id));
+            const prod = window.localProducts.find(p => String(p.id) === String(item.id) || p.slug.endsWith(String(item.id)));
             if (prod) {
                 totalCount += item.qty;
                 const priceVal = parseFloat(prod.price.replace(/[^\d\.]/g, '')) || 0;
@@ -250,11 +284,15 @@
         });
     };
 
+    function parsePrice(price) {
+        return parseFloat(String(price).replace(/[^\d.]/g, '')) || 0;
+    }
+
     function findProduct(productId) {
         const id = String(productId);
         return window.localProducts.find(prod =>
-            prod.id === id ||
-            String(prod.numeric_id) === id ||
+            String(prod.id) === id ||
+            (prod.numeric_id && String(prod.numeric_id) === id) ||
             prod.slug === id ||
             prod.slug.endsWith(id)
         );
@@ -268,65 +306,284 @@
             return;
         }
 
-        // Render dynamic quick view HTML
         const modalContainer = document.getElementById('quick-view-modal');
         if (!modalContainer) {
-            // Create quick view modal elements if not exists on products pages
             console.warn("quick-view-modal container not found on this page.");
             return;
         }
 
+        const priceNum = parsePrice(p.price);
+        const productUrl = 'product-detail.html?product=' + encodeURIComponent(p.slug || p.id);
+
         modalContainer.innerHTML = `
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; top: 10px; z-index: 10;">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <div class="modal-body">
+            <!-- Modal Header -->
+            <div class="modal-header d-flex align-items-center justify-content-between py-2 px-3 border-bottom">
+                <h5 class="modal-title font-weight-normal mb-0" style="font-size: 18px;">
+                    <a href="${productUrl}" class="text-dark text-decoration-none d-flex align-items-center">
+                        ${p.name} <i class="fa fa-chevron-right ml-2 text-muted" style="font-size: 14px;"></i>
+                    </a>
+                </h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close" style="font-size: 28px; padding: 0; margin: 0; outline: none; border: 0; background: transparent;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body p-3">
                 <div class="row">
+                    <!-- Left Side: Image and Thumbnails -->
                     <div class="col-lg-6 col-md-6 mb-3">
-                        <div class="d-flex align-items-center justify-content-center p-3 border rounded bg-white">
-                            <img src="${p.image}" class="img-fluid" style="max-height: 250px; object-fit: contain;" onerror="this.src='images/image-place-holder.png'">
+                        <div class="position-relative d-flex align-items-center justify-content-center p-3 border rounded bg-white" style="height: 380px;">
+                            <img src="${p.image}" class="img-fluid" style="max-height: 340px; object-fit: contain;" onerror="this.src='images/image-place-holder.png'">
+                            <!-- Brand Logo Overlay -->
+                            <div class="position-absolute" style="bottom: 15px; right: 20px; font-weight: 800; font-style: italic; font-size: 22px; color: #dc2626; letter-spacing: 1px; font-family: 'Arial Black', sans-serif;">
+                                <span style="font-size: 18px; vertical-align: middle; margin-right: 2px;">▲</span>${p.brand.toUpperCase()}
+                            </div>
+                        </div>
+                        <!-- Thumbnails -->
+                        <div class="d-flex mt-2">
+                            <div class="border rounded p-1 mr-2 bg-white" style="width: 60px; height: 60px; cursor: pointer;">
+                                <img src="${p.image}" class="w-100 h-100" style="object-fit: contain;" onerror="this.src='images/image-place-holder.png'">
+                            </div>
                         </div>
                     </div>
+                    
+                    <!-- Right Side: Details and Forms -->
                     <div class="col-lg-6 col-md-6">
                         <div class="product-details">
-                            <span class="small text-primary font-weight-bold">${p.brand}</span>
-                            <h2 class="h5 font-weight-bold mt-1">${p.name}</h2>
-                            <h3 class="h6 text-accent text-primary">${p.price}</h3>
+                            <h2 class="h4 font-weight-normal text-dark mb-2">${p.name}</h2>
                             
-                            <hr class="my-2">
-                            <form id="add-to-cart-form" class="mt-3">
+                            <!-- Rating -->
+                            <div class="d-flex align-items-center mb-3 small text-muted">
+                                <span class="text-warning mr-2" style="font-size: 16px;">☆ ☆ ☆ ☆ ☆</span>
+                                <span>(0)</span>
+                                <span class="mx-2">|</span>
+                                <span class="text-primary">0 Reviews</span>
+                                <span class="mx-2">|</span>
+                                <span class="text-primary">0 Orders</span>
+                                <span class="mx-2">|</span>
+                                <span class="text-primary">0 Wish Listed</span>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="h3 font-weight-bold mb-3" style="color: #1b7fed;">
+                                ${p.price}
+                            </div>
+                            
+                            <hr class="my-3" style="border-top: 1px solid #edf2f7;">
+                            
+                            <form id="add-to-cart-form" onsubmit="return false;">
                                 <input type="hidden" name="id" value="${p.id}">
-                                <div class="form-group d-flex align-items-center mb-3">
-                                    <div class="mr-3" style="width: 100px;">
-                                        <label class="small text-muted mb-1 d-block">Quantity</label>
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-prepend">
-                                                <button class="btn btn-outline-secondary px-2" type="button" onclick="const q = document.getElementById('modal-qty'); if(parseInt(q.value) > 1) q.value = parseInt(q.value) - 1;">-</button>
-                                            </div>
-                                            <input type="text" class="form-control text-center font-weight-bold p-0" id="modal-qty" name="quantity" value="1" readonly>
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary px-2" type="button" onclick="const q = document.getElementById('modal-qty'); q.value = parseInt(q.value) + 1;">+</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow-1 pt-3">
-                                        <button class="btn btn-primary btn-block btn-sm" type="button" onclick="addToCart('add-to-cart-form')">
-                                            <i class="czi-cart mr-2"></i>Add to Cart
-                                        </button>
+                                
+                                <!-- Quantity -->
+                                <div class="d-flex align-items-center mb-4">
+                                    <span class="font-weight-bold text-dark mr-3" style="font-size: 16px; min-width: 80px;">Quantity:</span>
+                                    <div class="d-flex align-items-center border rounded" style="border-color: #1b7fed !important; height: 38px; width: 140px; overflow: hidden;">
+                                        <button class="btn btn-link text-decoration-none px-3" type="button" id="modal-qty-minus" style="font-size: 18px; color: #1b7fed; font-weight: bold; border: 0; background: transparent;">-</button>
+                                        <input type="text" class="form-control text-center font-weight-bold p-0 border-0" id="modal-qty" name="quantity" value="1" readonly style="color: #334155; font-size: 16px;">
+                                        <button class="btn btn-link text-decoration-none px-3" type="button" id="modal-qty-plus" style="font-size: 18px; color: #1b7fed; font-weight: bold; border: 0; background: transparent;">+</button>
                                     </div>
                                 </div>
+                                
+                                <!-- Total Price -->
+                                <div class="mb-4 text-dark font-weight-bold" style="font-size: 16px;">
+                                    Total Price : <span id="modal-total-price" style="color: #1b7fed;">${p.price}</span> <span class="font-weight-normal text-muted" style="font-size: 12px; margin-left: 5px;">(Tax : incl.)</span>
+                                </div>
+                                
+                                <!-- Buttons -->
+                                <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+                                    <button class="btn btn-dark px-4 py-2 font-weight-bold mr-2" type="button" id="modal-buy-now" style="background: #000; border-radius: 4px; height: 42px; min-width: 110px;">Buy now</button>
+                                    <button class="btn btn-primary px-4 py-2 font-weight-bold mr-2" type="button" id="modal-add-cart" style="background: #1b7fed; border-radius: 4px; height: 42px; min-width: 120px;">Add to cart</button>
+                                    <button class="btn btn-outline-secondary px-3 py-2" type="button" id="modal-add-wishlist" style="border-color: #e2e8f0; color: #1b7fed; height: 42px; border-radius: 4px;">
+                                        <i class="fa fa-heart-o mr-2"></i>0
+                                    </button>
+                                </div>
                             </form>
-                            
-                            <div class="d-flex align-items-center">
-                                <button class="btn btn-outline-danger btn-sm" type="button" onclick="addWishlist('${p.id}')">
-                                    <i class="czi-heart mr-1"></i>Wishlist
-                                </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabs Section (Overview, Reviews, Tech Data) -->
+                    <div class="col-12 mt-4 pt-3 border-top">
+                        <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 15px;">
+                            <li class="nav-item">
+                                <a class="nav-link active font-weight-bold text-dark" data-toggle="tab" href="#modal-overview" role="tab">Overview</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link font-weight-bold text-dark" data-toggle="tab" href="#modal-reviews" role="tab">Reviews</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link font-weight-bold text-dark" data-toggle="tab" href="#modal-tech" role="tab">Technical data</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="modal-overview" role="tabpanel">
+                                <p class="text-muted" style="line-height: 1.6;">${p.description}</p>
                             </div>
+                            <div class="tab-pane fade" id="modal-reviews" role="tabpanel">
+                                <div class="text-center py-3 text-muted small">No reviews yet for this product.</div>
+                            </div>
+                            <div class="tab-pane fade" id="modal-tech" role="tabpanel">
+                                ${(p.category_id === 17 || (p.name && (p.name.toLowerCase().indexOf('machine') !== -1 || p.name.toLowerCase().indexOf('welder') !== -1 || p.name.toLowerCase().indexOf('grinder') !== -1 || p.name.toLowerCase().indexOf('saw') !== -1))) ? `
+                                    <div class="table-responsive small" style="max-height: 350px; overflow-y: auto;">
+                                        <table class="table table-bordered table-sm mb-0">
+                                            <thead class="thead-light">
+                                                <tr><th colspan="2" class="font-weight-bold text-primary">PLANER FSC 260</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">DIMENSIONS</td></tr>
+                                                <tr><td>Dimensions with morticer and hand</td><td>1250 X 1100 mm</td></tr>
+                                                <tr><td>Dimensions without morticer</td><td>1180 X 460 mm</td></tr>
+                                                <tr><td>Net weight</td><td>160 Kg</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">MOTOR</td></tr>
+                                                <tr><td>Powerful</td><td>3 hp</td></tr>
+                                                <tr><td>Type</td><td>1 Phase (220 V) (3 Phase on demand)</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">SURFACE PLANER – THICKNESSES PLANER</td></tr>
+                                                <tr><td>Number of Knives</td><td>N° 3</td></tr>
+                                                <tr><td>Length of planer spindle</td><td>260 mm</td></tr>
+                                                <tr><td>Diameter of planer spindle</td><td>70 mm</td></tr>
+                                                <tr><td>Length of cast iron table</td><td>1150 X 260 mm</td></tr>
+                                                <tr><td>Length of thicknesses table (excl. extension)</td><td>520 mm</td></tr>
+                                                <tr><td>Type of table</td><td>Tilt cast iron</td></tr>
+                                                <tr><td>Maximum working width</td><td>260 mm</td></tr>
+                                                <tr><td>Maximum working height</td><td>240 mm</td></tr>
+                                                <tr><td>Feeding Speed</td><td>7 m/min</td></tr>
+                                                <tr><td>Max Removal with surface planer</td><td>4 mm</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">MORTICER</td></tr>
+                                                <tr><td>Stroke of chisel head</td><td>100 mm</td></tr>
+                                                <tr><td>Table movement side to side</td><td>115 mm</td></tr>
+                                                <tr><td>Table movement front to back</td><td>80 mm</td></tr>
+                                                <tr><td>Size of cast iron table</td><td>360 x 210 mm</td></tr>
+                                                <tr><td>Rotation</td><td>Counter – Clockwise</td></tr>
+                                            </tbody>
+                                            
+                                            <thead class="thead-light">
+                                                <tr><th colspan="2" class="font-weight-bold text-primary">TABLE SAW TSI STANDARD</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">DIMENSIONS</td></tr>
+                                                <tr><td>Dimensions with carriage</td><td>1200 x 1800 mm</td></tr>
+                                                <tr><td>Dimensions without carriage</td><td>540 x 1800 mm</td></tr>
+                                                <tr><td>Net weight</td><td>280 Kg</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">CIRCULAR SAW</td></tr>
+                                                <tr><td>Saw Diameter</td><td>305 mm</td></tr>
+                                                <tr><td>Saw blade engrave Diameter</td><td>80 mm</td></tr>
+                                                <tr><td>Type</td><td>Tilts from 0° to 45° – Height adjustable</td></tr>
+                                                <tr><td>Speed Blade</td><td>5200 rpm</td></tr>
+                                                <tr><td>Maximum depth of cut</td><td>95 mm</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">SLIDING CARRIAGE</td></tr>
+                                                <tr><td>Dimensions carriage</td><td>700 x 530 mm</td></tr>
+                                                <tr><td>Type carriage</td><td>Alloy track close to blade</td></tr>
+                                                <tr><td>Maximum cutting</td><td>1200 mm</td></tr>
+                                                <tr><td>Carriage stroke</td><td>1300 mm</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">SPINDLE MOULDER</td></tr>
+                                                <tr><td>Type</td><td>Vertical</td></tr>
+                                                <tr><td>Max spindle height</td><td>115 mm (30 mm)</td></tr>
+                                                <tr><td>Max diameter spindle tooling</td><td>220 mm</td></tr>
+                                                <tr><td>Speeds</td><td>1750-3500-6700 rpm</td></tr>
+                                                
+                                                <tr class="table-secondary"><td colspan="2" class="font-weight-bold">MOTOR SPINDLE MOULDER</td></tr>
+                                                <tr><td>Powerful</td><td>3 Hp</td></tr>
+                                                <tr><td>Voltage</td><td>1 Phase 220 V (3 Phase on demand)</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ` : '<div class="text-center py-3 text-muted small">No technical specifications available.</div>'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Similar Products Section -->
+                    <div class="col-12 mt-4 pt-3 border-top">
+                        <h6 class="font-weight-bold mb-3 text-dark">Similar Products</h6>
+                        <div class="row">
+                            ${window.localProducts.filter(item => 
+                                String(item.id) !== String(p.id) && (
+                                    item.category_id === p.category_id ||
+                                    item.featured ||
+                                    item.best_selling
+                                )
+                            ).slice(0, 3).map(item => `
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-6 p-2">
+                                    <div class="card h-100 border p-2 text-center" style="cursor: pointer; transition: all 0.2s;" onclick="quickView('${item.id}')" onmouseover="this.style.borderColor='#1b7fed'" onmouseout="this.style.borderColor='#e2e8f0'">
+                                        <img src="${item.image}" class="img-fluid mb-2 mx-auto" style="height: 100px; object-fit: contain;" onerror="this.src='images/image-place-holder.png'">
+                                        <div class="small font-weight-bold text-dark text-truncate mb-1">${item.name}</div>
+                                        <div class="small text-primary font-weight-bold">${item.price}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 </div>
             </div>
         `;
+
+        // Wire modal controls
+        const qtyInput = document.getElementById('modal-qty');
+        const totalPriceVal = document.getElementById('modal-total-price');
+        const minusBtn = document.getElementById('modal-qty-minus');
+        const plusBtn = document.getElementById('modal-qty-plus');
+        const addCartBtn = document.getElementById('modal-add-cart');
+        const buyNowBtn = document.getElementById('modal-buy-now');
+        const wishBtn = document.getElementById('modal-add-wishlist');
+
+        const updateModalTotal = function() {
+            const qty = Math.max(1, parseInt(qtyInput.value || '1', 10));
+            qtyInput.value = qty;
+            totalPriceVal.innerText = 'QAR' + (priceNum * qty).toFixed(2);
+        };
+
+        if (minusBtn && plusBtn && qtyInput) {
+            minusBtn.addEventListener('click', function() {
+                const cur = parseInt(qtyInput.value || '1', 10);
+                if (cur > 1) {
+                    qtyInput.value = cur - 1;
+                    updateModalTotal();
+                }
+            });
+            plusBtn.addEventListener('click', function() {
+                const cur = parseInt(qtyInput.value || '1', 10);
+                qtyInput.value = cur + 1;
+                updateModalTotal();
+            });
+        }
+
+        if (addCartBtn) {
+            addCartBtn.addEventListener('click', function() {
+                if (window.addToCartLocal) {
+                    window.addToCartLocal(p.id, parseInt(qtyInput.value || '1', 10));
+                    $('#quick-view').modal('hide');
+                } else {
+                    addToCart('add-to-cart-form');
+                    $('#quick-view').modal('hide');
+                }
+            });
+        }
+
+        if (buyNowBtn) {
+            buyNowBtn.addEventListener('click', function() {
+                if (window.addToCartLocal) {
+                    window.addToCartLocal(p.id, parseInt(qtyInput.value || '1', 10));
+                    $('#quick-view').modal('hide');
+                    alert('Product added. Continue to checkout from the cart.');
+                } else {
+                    addToCart('add-to-cart-form', true);
+                    $('#quick-view').modal('hide');
+                }
+            });
+        }
+
+        if (wishBtn) {
+            wishBtn.addEventListener('click', function() {
+                if (window.addWishlist) {
+                    window.addWishlist(p.id, 'add-wishlist-modal');
+                }
+            });
+        }
 
         // Open modal
         $('#quick-view').modal('show');
