@@ -97,6 +97,14 @@ app.get('/products', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'products.html'));
 });
 
+app.get('/sellers', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'sellers.html'));
+});
+
+app.get('/shop/apply', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'shop-apply.html'));
+});
+
 app.get('/product', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'product-detail.html'));
 });
