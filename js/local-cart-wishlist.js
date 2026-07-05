@@ -476,55 +476,74 @@
                 const modalHtml = `
                     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 99999;">
                         <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-                                <div class="modal-header border-0 bg-light py-3">
-                                    <h5 class="modal-title font-weight-bold" style="color: #0f172a;">Sign In / Sign Up</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: var(--hover-shadow);">
+                                <div class="modal-header border-0 bg-light py-3 d-flex align-items-center justify-content-between">
+                                    <h5 class="modal-title font-weight-bold" style="font-family: var(--font-heading); color: var(--dark-slate); font-size: 20px;">Amwaj Customer Account</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size: 24px; padding: 0; margin: 0; color: #64748b; background: transparent; border: none; outline: none; cursor: pointer;">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body p-4">
-                                    <ul class="nav nav-tabs border-bottom mb-3" role="tablist">
-                                        <li class="nav-item">
-                                            <a class="nav-link active font-weight-semibold" data-toggle="tab" href="#modal-login-tab" role="tab">Sign In</a>
+                                    <ul class="nav nav-tabs border-bottom mb-4" role="tablist" style="border-color: #f1f5f9 !important;">
+                                        <li class="nav-item" style="width: 50%;">
+                                            <a class="nav-link active font-weight-bold text-center border-0" data-toggle="tab" href="#modal-login-tab" role="tab" style="font-family: var(--font-heading); border-bottom: 2px solid transparent !important; color: #64748b; padding-bottom: 12px;">Sign In</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link font-weight-semibold" data-toggle="tab" href="#modal-register-tab" role="tab">Sign Up</a>
+                                        <li class="nav-item" style="width: 50%;">
+                                            <a class="nav-link font-weight-bold text-center border-0" data-toggle="tab" href="#modal-register-tab" role="tab" style="font-family: var(--font-heading); border-bottom: 2px solid transparent !important; color: #64748b; padding-bottom: 12px;">Sign Up</a>
                                         </li>
                                     </ul>
-                                    <div class="tab-content pt-2">
+                                    <style>
+                                        #loginModal .nav-tabs .nav-link.active {
+                                            color: var(--primary-color) !important;
+                                            border-bottom: 2px solid var(--primary-color) !important;
+                                            background: transparent !important;
+                                        }
+                                        #loginModal .form-control {
+                                            border-radius: 10px !important;
+                                            border: 1px solid #cbd5e1 !important;
+                                            padding: 10px 14px !important;
+                                            font-size: 14px !important;
+                                        }
+                                        #loginModal .form-control:focus {
+                                            border-color: var(--primary-color) !important;
+                                            box-shadow: 0 0 0 3px var(--primary-glow) !important;
+                                        }
+                                    </style>
+                                    <div class="tab-content pt-1">
                                         <div class="tab-pane active" id="modal-login-tab" role="tabpanel">
                                             <form id="modal-login-form">
-                                                <div class="form-group">
-                                                    <label class="small font-weight-bold text-dark">Email Address</label>
-                                                    <input type="email" id="modal-login-email" class="form-control" placeholder="E.g. customer@example.com" required style="border-radius: 8px;">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold text-dark mb-1">Email Address</label>
+                                                    <input type="email" id="modal-login-email" class="form-control" placeholder="E.g. customer@example.com" required>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label class="small font-weight-bold text-dark">Password</label>
-                                                    <input type="password" id="modal-login-password" class="form-control" placeholder="••••••••" required style="border-radius: 8px;">
+                                                <div class="form-group mb-4">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <label class="small font-weight-bold text-dark mb-0">Password</label>
+                                                    </div>
+                                                    <input type="password" id="modal-login-password" class="form-control" placeholder="••••••••" required>
                                                 </div>
-                                                <button type="submit" class="btn btn-primary btn-block mt-4" style="border-radius: 8px;">Log In</button>
+                                                <button type="submit" class="btn btn-primary btn-block text-white py-2 btn-login-submit" style="font-weight: 700; border-radius: 12px;">Log In</button>
                                             </form>
                                         </div>
                                         <div class="tab-pane" id="modal-register-tab" role="tabpanel">
                                             <form id="modal-register-form">
-                                                <div class="form-group">
-                                                    <label class="small font-weight-bold text-dark">Full Name</label>
-                                                    <input type="text" id="modal-register-name" class="form-control" placeholder="E.g. Maulik Joshi" required style="border-radius: 8px;">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold text-dark mb-1">Full Name</label>
+                                                    <input type="text" id="modal-register-name" class="form-control" placeholder="E.g. Maulik Joshi" required>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label class="small font-weight-bold text-dark">Email Address</label>
-                                                    <input type="email" id="modal-register-email" class="form-control" placeholder="E.g. customer@example.com" required style="border-radius: 8px;">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold text-dark mb-1">Email Address</label>
+                                                    <input type="email" id="modal-register-email" class="form-control" placeholder="E.g. customer@example.com" required>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label class="small font-weight-bold text-dark">Phone Number</label>
-                                                    <input type="text" id="modal-register-phone" class="form-control" placeholder="E.g. +974 5555 1234" style="border-radius: 8px;">
+                                                <div class="form-group mb-3">
+                                                    <label class="small font-weight-bold text-dark mb-1">Phone Number</label>
+                                                    <input type="text" id="modal-register-phone" class="form-control" placeholder="E.g. +974 5555 1234">
                                                 </div>
-                                                <div class="form-group">
-                                                    <label class="small font-weight-bold text-dark">Password (min 6 chars)</label>
-                                                    <input type="password" id="modal-register-password" class="form-control" placeholder="••••••••" required style="border-radius: 8px;">
+                                                <div class="form-group mb-4">
+                                                    <label class="small font-weight-bold text-dark mb-1">Password (min 6 characters)</label>
+                                                    <input type="password" id="modal-register-password" class="form-control" placeholder="••••••••" required minlength="6">
                                                 </div>
-                                                <button type="submit" class="btn btn-primary btn-block mt-4" style="border-radius: 8px;">Create Account</button>
+                                                <button type="submit" class="btn btn-primary btn-block text-white py-2 btn-register-submit" style="font-weight: 700; border-radius: 12px;">Create Account</button>
                                             </form>
                                         </div>
                                     </div>
@@ -534,12 +553,16 @@
                     </div>
                 `;
                 $('body').append(modalHtml);
-
+ 
                 // Handle login
                 $('#modal-login-form').on('submit', function(e) {
                     e.preventDefault();
                     const email = $('#modal-login-email').val();
                     const password = $('#modal-login-password').val();
+                    const submitBtn = $('.btn-login-submit');
+                    const originalText = submitBtn.text();
+
+                    submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-2"></i>Verifying...');
                     
                     $.ajax({
                         url: 'http://localhost:5000/api/v1/auth/login',
@@ -550,15 +573,26 @@
                             localStorage.setItem('token', res.data.token);
                             localStorage.setItem('user', JSON.stringify(res.data.user));
                             $('#loginModal').modal('hide');
-                            alert('Welcome back, ' + res.data.user.name + '!');
-                            window.location.reload();
+                            
+                            if (window.toastr) {
+                                toastr.success('Welcome back, ' + res.data.user.name + '!', 'Login Successful');
+                            }
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                         },
                         error: function(err) {
-                            alert(err.responseJSON ? err.responseJSON.message : 'Invalid credentials');
+                            submitBtn.prop('disabled', false).text(originalText);
+                            const msg = err.responseJSON ? err.responseJSON.message : 'Invalid credentials';
+                            if (window.toastr) {
+                                toastr.error(msg, 'Authentication Failed');
+                            } else {
+                                alert(msg);
+                            }
                         }
                     });
                 });
-
+ 
                 // Handle registration
                 $('#modal-register-form').on('submit', function(e) {
                     e.preventDefault();
@@ -568,7 +602,11 @@
                         phone: $('#modal-register-phone').val(),
                         password: $('#modal-register-password').val()
                     };
+                    const submitBtn = $('.btn-register-submit');
+                    const originalText = submitBtn.text();
 
+                    submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-2"></i>Registering...');
+ 
                     $.ajax({
                         url: 'http://localhost:5000/api/v1/auth/register',
                         method: 'POST',
@@ -578,18 +616,29 @@
                             localStorage.setItem('token', res.data.token);
                             localStorage.setItem('user', JSON.stringify(res.data.user));
                             $('#loginModal').modal('hide');
-                            alert('Registration successful! Welcome, ' + res.data.user.name + '!');
-                            window.location.reload();
+                            
+                            if (window.toastr) {
+                                toastr.success('Welcome to Amwaj Store, ' + res.data.user.name + '!', 'Registration Successful');
+                            }
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                         },
                         error: function(err) {
-                            alert(err.responseJSON ? err.responseJSON.message : 'Registration failed');
+                            submitBtn.prop('disabled', false).text(originalText);
+                            const msg = err.responseJSON ? err.responseJSON.message : 'Registration failed';
+                            if (window.toastr) {
+                                toastr.error(msg, 'Account Creation Failed');
+                            } else {
+                                alert(msg);
+                            }
                         }
                     });
                 });
             }
             $('#loginModal').modal('show');
         }
-
+ 
         updateAuthUI();
     });
 })();
