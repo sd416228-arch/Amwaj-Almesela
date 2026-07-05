@@ -342,11 +342,12 @@
         if (window.jQuery) {
             const mockSearch = function(options, successCb, completeCb) {
                 const query = (options.data && options.data.name) ? options.data.name.toLowerCase().trim() : '';
-                const filtered = (window.localProducts || []).filter(p => 
-                    p.name.toLowerCase().includes(query) || 
-                    (p.brand && p.brand.toLowerCase().includes(query)) ||
-                    (p.description && p.description.toLowerCase().includes(query))
-                );
+                const filtered = (window.localProducts || []).filter(p => {
+                    const b = typeof p.brand === 'object' && p.brand ? p.brand.name : p.brand;
+                    return p.name.toLowerCase().includes(query) || 
+                        (b && b.toLowerCase().includes(query)) ||
+                        (p.description && p.description.toLowerCase().includes(query));
+                });
                 
                 let html = '';
                 if (filtered.length === 0) {

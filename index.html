@@ -5062,14 +5062,18 @@
     <script>
         /*--flash deal Progressbar --*/
         function update_flash_deal_progress_bar() {
-            const current_time_stamp = new Date().getTime();
-            const start_date = new Date('').getTime();
             const countdownElement = document.querySelector('.cz-countdown');
-            const get_end_time = countdownElement.getAttribute('data-countdown');
-            const end_time = new Date(get_end_time).getTime();
-            let time_progress = ((current_time_stamp - start_date) / (end_time - start_date)) * 100;
             const progress_bar = document.querySelector('.flash-deal-progress-bar');
-            progress_bar.style.width = time_progress + '%';
+            if (countdownElement && progress_bar) {
+                const current_time_stamp = new Date().getTime();
+                const start_date = new Date('').getTime();
+                const get_end_time = countdownElement.getAttribute('data-countdown');
+                if (get_end_time) {
+                    const end_time = new Date(get_end_time).getTime();
+                    let time_progress = ((current_time_stamp - start_date) / (end_time - start_date)) * 100;
+                    progress_bar.style.width = time_progress + '%';
+                }
+            }
         }
         update_flash_deal_progress_bar();
         setInterval(update_flash_deal_progress_bar, 10000);

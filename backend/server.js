@@ -86,7 +86,13 @@ app.use('/api/v1/admin/analytics', require('./routes/analytics.routes'));
 app.use('/api/v1/settings', require('./routes/settings.routes'));
 
 // ── Serve Static Assets ──
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '..'), {
+    etag: false,
+    maxAge: 0,
+    setHeaders: (res) => {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    }
+}));
 
 // ── Clean URL Front-End Routes ──
 app.get('/home', (req, res) => {

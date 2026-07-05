@@ -2,6 +2,8 @@
     'use strict';
 
     const PRODUCTS_PER_PAGE = 12;
+    let globalCategories = [];
+    let globalProducts = [];
 
     function getCategoryIdsForFilter(catId, categories) {
         const id = parseInt(catId, 10);
@@ -49,14 +51,14 @@
         style.innerHTML = `
             .local-product-page {
                 background: #f8fafc;
-                padding-top: 2rem;
-                padding-bottom: 2.5rem;
+                padding-top: 1.5rem;
+                padding-bottom: 2rem;
             }
 
             .local-product-shell {
                 display: grid;
                 grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.24fr) 320px;
-                gap: 28px;
+                gap: 24px;
                 align-items: start;
             }
 
@@ -67,12 +69,12 @@
             .local-product-tabs {
                 background: #fff;
                 border: 1px solid #e4efff;
-                box-shadow: 0 10px 28px rgba(20, 85, 172, .06);
+                box-shadow: 0 4px 12px rgba(20, 85, 172, .03);
             }
 
             .local-product-gallery,
             .local-product-tabs {
-                border-radius: 8px;
+                border-radius: 6px;
             }
 
             .local-product-info {
@@ -82,26 +84,26 @@
             }
 
             .local-main-image {
-                min-height: 480px;
+                min-height: 400px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 34px;
+                padding: 20px;
                 position: relative;
             }
 
             .local-main-image img {
                 max-width: 100%;
-                max-height: 430px;
+                max-height: 360px;
                 object-fit: contain;
             }
 
             .local-share-btn {
                 position: absolute;
-                top: 38px;
-                right: 38px;
-                width: 30px;
-                height: 30px;
+                top: 20px;
+                right: 20px;
+                width: 28px;
+                height: 28px;
                 border-radius: 50%;
                 border: 0;
                 background: #85c93d;
@@ -109,70 +111,73 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
+                font-size: 13px;
+                cursor: pointer;
             }
 
             .local-thumb {
-                width: 96px;
-                height: 96px;
+                width: 64px;
+                height: 64px;
                 border: 1px solid #e0ebfb;
-                border-radius: 7px;
+                border-radius: 4px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 background: #fff;
-                margin-top: 14px;
+                margin-top: 10px;
+                cursor: pointer;
             }
 
             .local-thumb img {
-                max-width: 72px;
-                max-height: 72px;
+                max-width: 50px;
+                max-height: 50px;
                 object-fit: contain;
             }
 
             .local-product-title {
-                color: #1f2937;
-                font-size: 34px;
-                line-height: 1.32;
+                color: #2b3344;
+                font-size: 22px;
+                line-height: 1.3;
                 font-weight: 700;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }
 
             .local-rating {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 10px;
+                gap: 8px;
                 align-items: center;
-                color: #334155;
-                font-size: 18px;
-                margin-bottom: 18px;
+                color: #4b566b;
+                font-size: 13px;
+                margin-bottom: 14px;
             }
 
             .local-stars {
-                color: #ff8a3d;
-                letter-spacing: 2px;
+                color: #fe9a42;
+                letter-spacing: 1px;
                 white-space: nowrap;
             }
 
             .local-price {
                 color: #1b7fed;
-                font-size: 42px;
+                font-size: 26px;
                 font-weight: 700;
-                margin-bottom: 24px;
+                margin-bottom: 18px;
             }
 
             .local-quantity-row {
                 display: flex;
                 align-items: center;
-                gap: 18px;
-                margin-bottom: 22px;
+                gap: 12px;
+                margin-bottom: 16px;
             }
 
             .local-qty-control {
                 display: inline-grid;
-                grid-template-columns: 48px 58px 48px;
-                height: 56px;
-                border: 1px solid #1b7fed;
-                border-radius: 7px;
+                grid-template-columns: 32px 42px 32px;
+                height: 36px;
+                border: 1px solid #dae1e7;
+                border-radius: 4px;
                 overflow: hidden;
                 background: #fff;
             }
@@ -183,41 +188,53 @@
                 background: #fff;
                 color: #1b7fed;
                 text-align: center;
-                font-size: 18px;
+                font-size: 14px;
+                padding: 0;
+            }
+
+            .local-qty-control button {
+                cursor: pointer;
+                font-weight: bold;
             }
 
             .local-qty-control input {
-                color: #334155;
-                border-left: 1px solid #e4efff;
-                border-right: 1px solid #e4efff;
+                color: #3f4a5f;
+                border-left: 1px solid #dae1e7;
+                border-right: 1px solid #dae1e7;
             }
 
             .local-total {
-                font-size: 22px;
-                font-weight: 700;
-                color: #1f2937;
-                margin-bottom: 26px;
+                font-size: 15px;
+                font-weight: 600;
+                color: #373f50;
+                margin-bottom: 20px;
             }
 
             .local-total span {
                 color: #1b7fed;
+                font-weight: 700;
             }
 
             .local-action-row {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 24px;
+                gap: 12px;
                 align-items: center;
             }
 
             .local-buy-btn,
             .local-cart-btn,
             .local-wish-btn {
-                height: 64px;
-                border-radius: 7px;
-                font-size: 24px;
+                height: 40px;
+                border-radius: 4px;
+                font-size: 14px;
+                font-weight: 600;
                 border: 0;
-                padding: 0 34px;
+                padding: 0 20px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
             }
 
             .local-buy-btn {
@@ -232,9 +249,14 @@
 
             .local-wish-btn {
                 background: #fff;
-                color: #1b7fed;
-                border: 1px solid #dce8f7;
-                min-width: 114px;
+                color: #7d879c;
+                border: 1px solid #dae1e7;
+                min-width: 48px;
+                padding: 0 12px;
+            }
+
+            .local-wish-btn i {
+                font-size: 16px;
             }
 
             .local-side-panel {
@@ -244,19 +266,19 @@
 
             .local-service-list {
                 background: #fff;
-                border-radius: 7px;
+                border-radius: 4px;
                 overflow: hidden;
-                box-shadow: 0 10px 28px rgba(20, 85, 172, .06);
+                box-shadow: 0 4px 12px rgba(20, 85, 172, .03);
             }
 
             .local-service-item {
                 display: flex;
                 align-items: center;
-                gap: 16px;
-                padding: 24px;
+                gap: 12px;
+                padding: 14px 16px;
                 border-bottom: 1px solid #eef2f7;
-                color: #525f70;
-                font-size: 18px;
+                color: #6c727f;
+                font-size: 13px;
             }
 
             .local-service-item:last-child {
@@ -264,43 +286,43 @@
             }
 
             .local-service-icon {
-                width: 32px;
+                width: 24px;
                 text-align: center;
-                font-size: 22px;
+                font-size: 16px;
             }
 
             .local-store-card {
-                border-radius: 7px;
-                padding: 28px;
+                border-radius: 4px;
+                padding: 20px;
                 text-align: center;
             }
 
             .local-store-avatar {
-                width: 96px;
-                height: 96px;
-                margin: 8px auto 24px;
+                width: 64px;
+                height: 64px;
+                margin: 4px auto 16px;
                 border-radius: 50%;
                 background: #eef6ff;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: #9ab1cc;
-                font-size: 32px;
+                font-size: 24px;
             }
 
             .local-store-name {
-                color: #000;
-                font-size: 24px;
+                color: #373f50;
+                font-size: 15px;
                 font-weight: 700;
-                margin-bottom: 24px;
+                margin-bottom: 16px;
             }
 
             .local-store-stats {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                gap: 18px;
+                gap: 12px;
                 color: #1b7fed;
-                font-size: 18px;
+                font-size: 13px;
             }
 
             .local-store-stats div:first-child {
@@ -309,28 +331,30 @@
 
             .local-detail-bottom {
                 display: grid;
-                grid-template-columns: minmax(0, 1fr) 458px;
-                gap: 28px;
-                margin-top: 28px;
+                grid-template-columns: minmax(0, 1fr) 320px;
+                gap: 24px;
+                margin-top: 24px;
             }
 
             .local-product-tabs {
-                min-height: 390px;
-                padding: 46px 60px;
+                min-height: 280px;
+                padding: 30px;
             }
 
             .local-tab-buttons {
                 text-align: center;
-                margin-bottom: 40px;
+                margin-bottom: 24px;
             }
 
             .local-tab-buttons button {
-                min-width: 136px;
-                height: 58px;
-                border-radius: 28px;
+                min-width: 100px;
+                height: 38px;
+                border-radius: 19px;
                 border: 0;
                 background: transparent;
-                font-size: 20px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
             }
 
             .local-tab-buttons button.active {
@@ -339,34 +363,34 @@
             }
 
             .local-about-title {
-                color: #334155;
+                color: #373f50;
                 font-weight: 700;
-                font-size: 20px;
-                margin-bottom: 24px;
+                font-size: 15px;
+                margin-bottom: 16px;
             }
 
             .local-about-list {
-                color: #334155;
-                font-size: 20px;
-                line-height: 1.55;
+                color: #4b566b;
+                font-size: 14px;
+                line-height: 1.5;
                 padding-left: 0;
                 list-style-position: inside;
             }
 
             .local-related-title {
-                font-size: 26px;
+                font-size: 18px;
                 font-weight: 700;
-                color: #1f2937;
-                margin: 10px 0 24px;
+                color: #373f50;
+                margin: 0px 0 16px;
             }
 
             .local-related-card {
                 display: grid;
-                grid-template-columns: 170px 1fr;
-                gap: 26px;
-                border-radius: 7px;
-                padding: 24px;
-                margin-bottom: 16px;
+                grid-template-columns: 100px 1fr;
+                gap: 16px;
+                border-radius: 4px;
+                padding: 16px;
+                margin-bottom: 12px;
                 color: inherit;
             }
 
@@ -376,23 +400,23 @@
             }
 
             .local-related-card img {
-                width: 156px;
-                height: 156px;
+                width: 90px;
+                height: 90px;
                 object-fit: contain;
             }
 
             .local-related-name {
-                color: #111827;
-                font-size: 20px;
-                line-height: 1.42;
+                color: #373f50;
+                font-size: 14px;
+                line-height: 1.35;
                 font-weight: 700;
-                margin-bottom: 16px;
+                margin-bottom: 8px;
             }
 
             .local-related-price {
-                color: #1f2937;
-                font-size: 22px;
-                font-weight: 600;
+                color: #1b7fed;
+                font-size: 15px;
+                font-weight: 700;
             }
 
             @media (max-width: 1199px) {
@@ -426,36 +450,36 @@
                 }
 
                 .local-product-title {
-                    font-size: 26px;
+                    font-size: 20px;
                 }
 
                 .local-price {
-                    font-size: 34px;
+                    font-size: 24px;
                 }
 
                 .local-buy-btn,
                 .local-cart-btn,
                 .local-wish-btn {
                     width: 100%;
-                    font-size: 20px;
+                    font-size: 14px;
                 }
 
                 .local-product-tabs {
-                    padding: 30px 22px;
+                    padding: 20px 16px;
                 }
 
                 .local-about-list {
-                    font-size: 17px;
+                    font-size: 13px;
                 }
 
                 .local-related-card {
-                    grid-template-columns: 116px 1fr;
-                    gap: 16px;
+                    grid-template-columns: 90px 1fr;
+                    gap: 12px;
                 }
 
                 .local-related-card img {
-                    width: 108px;
-                    height: 108px;
+                    width: 80px;
+                    height: 80px;
                 }
             }
         `;
@@ -486,7 +510,7 @@
     }
 
     function renderRelatedCard(product) {
-        return '<a class="local-related-card" href="/product?product=' + encodeURIComponent(product.slug || product.id) + '">' +
+        return '<a class="local-related-card" href="/products?product=' + encodeURIComponent(product.slug || product.id) + '" onclick="openProductDetailInline(event, \'' + (product.slug || product.id) + '\')">' +
             '<img src="' + product.image + '" alt="' + escapeHtml(product.name) + '" onerror="this.src=\'images/image-place-holder.png\'">' +
             '<div>' +
             '<div class="local-related-name">' + escapeHtml(product.name) + '</div>' +
@@ -516,6 +540,15 @@
 
         container.classList.add('local-product-page');
         container.innerHTML =
+            '<div class="d-flex justify-content-between align-items-center bg-white px-3 py-3 mb-4 border rounded" style="box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
+            '  <div class="d-flex align-items-center" style="font-size: 15px; font-weight: 700; color: #1f2937;">' +
+            '    <span class="text-uppercase">' + escapeHtml(product.name) + '</span>' +
+            '    <span class="ml-2" style="color: #1b7fed; font-weight: bold; font-size: 18px; line-height: 1;">&gt;</span>' +
+            '  </div>' +
+            '  <button type="button" class="close" onclick="closeProductDetailInline()" aria-label="Close" style="font-size: 24px; color: #9ca3af; background: transparent; border: 0; padding: 0; margin: 0; line-height: 1; cursor: pointer; outline: none; transition: color 0.15s ease-in-out;">' +
+            '    <span aria-hidden="true">&times;</span>' +
+            '  </button>' +
+            '</div>' +
             '<div class="local-product-shell">' +
             '<div>' +
             '<div class="local-product-gallery">' +
@@ -556,6 +589,7 @@
             '<div class="local-store-avatar"><i class="fa fa-picture-o"></i></div>' +
             '<div class="local-store-name">AMWAJ ALMSELA</div>' +
             '<div class="local-store-stats"><div><div class="local-stars small">&#9733;&#9733;&#9733;</div><strong>0</strong> Reviews</div><div><i class="fa fa-archive text-warning d-block mb-2"></i><strong>15</strong> Products</div></div>' +
+            '<a href="sellers.html" class="btn btn-primary btn-sm btn-block mt-3" style="background-color: #1b7fed; border-color: #1b7fed; border-radius: 4px; font-weight: 600; color: #fff;"><i class="fa fa-shopping-bag mr-2"></i>Visit Store</a>' +
             '</div>' +
             '</aside>' +
             '</div>' +
@@ -593,6 +627,10 @@
         qtyInput.addEventListener('change', updateTotal);
 
         document.getElementById('local-add-cart').addEventListener('click', function () {
+            if (!product.in_stock) {
+                $('#outof-stock-modal').modal('show');
+                return;
+            }
             if (window.addToCartLocal) {
                 window.addToCartLocal(product.id, parseInt(qtyInput.value || '1', 10));
             } else {
@@ -600,6 +638,10 @@
             }
         });
         document.getElementById('local-buy-now').addEventListener('click', function () {
+            if (!product.in_stock) {
+                $('#outof-stock-modal').modal('show');
+                return;
+            }
             if (window.addToCartLocal) {
                 window.addToCartLocal(product.id, parseInt(qtyInput.value || '1', 10));
                 alert('Product added. Continue to checkout from the cart.');
@@ -611,7 +653,7 @@
             if (window.addWishlist) window.addWishlist(product.id, 'add-wishlist-modal');
         });
 
-        window.history.replaceState(null, '', '/product?product=' + productSlug);
+        window.history.replaceState(null, '', '/products?product=' + productSlug);
     }
 
     function filterProducts(products, categories, urlParams) {
@@ -623,7 +665,8 @@
 
         if (categoryId && filterType === 'brand') {
             filtered = products.filter(function (p) {
-                return p.brand && p.brand.toLowerCase() === 'amwaj';
+                const b = typeof p.brand === 'object' && p.brand ? p.brand.name : p.brand;
+                return b && b.toLowerCase() === 'amwaj';
             });
             titleText = 'AMWAJ Brand Products';
         } else if (categoryId) {
@@ -633,8 +676,9 @@
         } else if (searchQuery) {
             const query = searchQuery.toLowerCase().trim();
             filtered = products.filter(function (p) {
+                const b = typeof p.brand === 'object' && p.brand ? p.brand.name : p.brand;
                 return p.name.toLowerCase().includes(query) ||
-                    (p.brand && p.brand.toLowerCase().includes(query)) ||
+                    (b && b.toLowerCase().includes(query)) ||
                     (p.description && p.description.toLowerCase().includes(query));
             });
             titleText = 'Search Results for "' + searchQuery + '"';
@@ -653,8 +697,9 @@
         } else if (filterType === 'search' && searchQuery) {
             const query = searchQuery.toLowerCase().trim();
             filtered = products.filter(function (p) {
+                const b = typeof p.brand === 'object' && p.brand ? p.brand.name : p.brand;
                 return p.name.toLowerCase().includes(query) ||
-                    (p.brand && p.brand.toLowerCase().includes(query));
+                    (b && b.toLowerCase().includes(query));
             });
             titleText = 'Search Results for "' + searchQuery + '"';
         }
@@ -663,20 +708,22 @@
     }
 
     function renderProductCard(p) {
+        const slugStr = p.slug || p.id;
+        const brandName = typeof p.brand === 'object' && p.brand ? p.brand.name : (p.brand || '');
         return '<div class="col-lg-4 col-md-4 col-sm-6 col-6 p-2">' +
             '<div class="product-single-hover shadow-none rtl">' +
             '<div class="overflow-hidden position-relative">' +
             '<div class="inline_product clickable">' +
             '<span class="for-discoutn-value-null"></span>' +
-            '<a href="/product?product=' + encodeURIComponent(p.slug || p.id) + '">' +
+            '<a href="/products?product=' + encodeURIComponent(slugStr) + '" onclick="openProductDetailInline(event, \'' + slugStr + '\')">' +
             '<img src="' + p.image + '" onerror="this.src=\'images/image-place-holder.png\'">' +
             '</a>' +
             '<div class="quick-view">' +
             '<a class="btn-circle stopPropagation" href="javascript:" onclick="quickView(\'' + (p.numeric_id || p.id) + '\')">' +
             '<i class="czi-eye align-middle"></i></a></div></div>' +
             '<div class="single-product-details">' +
-            '<div class="mb-1"><span class="small text-muted">' + p.brand + '</span></div>' +
-            '<div><a href="/product?product=' + encodeURIComponent(p.slug || p.id) + '" class="text-capitalize fw-semibold text-truncate d-block">' + p.name + '</a></div>' +
+            '<div class="mb-1"><span class="small text-muted">' + brandName + '</span></div>' +
+            '<div><a href="/products?product=' + encodeURIComponent(slugStr) + '" onclick="openProductDetailInline(event, \'' + slugStr + '\')" class="text-capitalize fw-semibold text-truncate d-block">' + p.name + '</a></div>' +
             '<div class="justify-content-between"><div class="product-price">' +
             '<span class="text-accent text-dark font-weight-bold">' + p.price + '</span></div></div>' +
             '</div></div></div></div>';
@@ -699,7 +746,136 @@
         return html;
     }
 
+    window.closeProductDetailInline = function () {
+        const container = document.querySelector('.__inline-61 > .container.py-4');
+        if (!container) return;
+
+        container.classList.remove('local-product-page');
+        container.innerHTML = window.initialProductsContainerHTML;
+
+        // Restore original URL search parameters (remove product query)
+        const originalParams = new URLSearchParams(window.originalUrlSearch);
+        originalParams.delete('product');
+        originalParams.delete('slug');
+        const searchStr = originalParams.toString();
+        window.history.pushState(null, '', window.location.pathname + (searchStr ? '?' + searchStr : ''));
+
+        // Re-run the setup
+        setupProductsPage(globalCategories, globalProducts, originalParams);
+    };
+
+    window.openProductDetailInline = function (event, slug) {
+        if (event) event.preventDefault();
+        const product = findProductBySlug(globalProducts, slug);
+        if (product) {
+            renderProductDetail(product, globalProducts);
+            // Push history state
+            const currentParams = new URLSearchParams(window.location.search);
+            currentParams.set('product', slug);
+            window.history.pushState({ productSlug: slug }, '', window.location.pathname + '?' + currentParams.toString());
+        }
+    };
+
+    window.addEventListener('popstate', function (e) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productSlug = urlParams.get('product') || urlParams.get('slug');
+        const container = document.querySelector('.__inline-61 > .container.py-4');
+        if (!container) return;
+
+        if (productSlug) {
+            const product = findProductBySlug(globalProducts, productSlug);
+            if (product) {
+                renderProductDetail(product, globalProducts);
+                return;
+            }
+        }
+        
+        // Restore products grid
+        container.classList.remove('local-product-page');
+        container.innerHTML = window.initialProductsContainerHTML;
+        setupProductsPage(globalCategories, globalProducts, urlParams);
+    });
+
+    function setupProductsPage(categories, products, urlParams) {
+        const grid = document.getElementById('products-grid');
+        const titleEl = document.getElementById('page-title');
+        if (!grid || !titleEl) return;
+
+        const currentPage = Math.max(1, parseInt(urlParams.get('page') || '1', 10));
+
+        const result = filterProducts(products, categories, urlParams);
+        let filteredProducts = result.filtered;
+        const titleText = result.titleText;
+
+        titleEl.innerText = titleText + ' (' + filteredProducts.length + ')';
+
+        const categoriesContainer = document.getElementById('local-categories-list');
+        if (categoriesContainer) {
+            const activeCatId = urlParams.get('id') || urlParams.get('category');
+            categoriesContainer.innerHTML = categories.map(function (cat) {
+                const isActive = activeCatId && parseInt(activeCatId, 10) === cat.id;
+                let html = '<li class="mb-2">' +
+                    '<a href="/products?id=' + cat.id + '&data_from=category&page=1" class="' +
+                    (isActive ? 'text-primary font-weight-bold' : 'text-dark font-weight-bold') + ' d-block">' +
+                    cat.name + '</a>';
+                if (cat.subcategories.length > 0) {
+                    html += '<ul class="list-unstyled pl-3 mt-1 small">';
+                    html += cat.subcategories.map(function (sub) {
+                        const subActive = activeCatId && parseInt(activeCatId, 10) === sub.id;
+                        return '<li class="mb-1"><a href="/products?id=' + sub.id +
+                            '&data_from=category&page=1" class="' +
+                            (subActive ? 'text-primary' : 'text-muted') + ' d-block">' + sub.name + '</a></li>';
+                    }).join('');
+                    html += '</ul>';
+                }
+                html += '</li>';
+                return html;
+            }).join('');
+        }
+
+        function renderProducts(items, page) {
+            if (items.length === 0) {
+                grid.innerHTML = '<div class="col-12 text-center py-5">' +
+                    '<img src="images/empty-cart.svg" width="100" class="mb-3">' +
+                    '<p class="text-muted">No products found.</p></div>';
+                return;
+            }
+
+            const totalPages = Math.ceil(items.length / PRODUCTS_PER_PAGE);
+            const pageNum = Math.min(page, totalPages);
+            const start = (pageNum - 1) * PRODUCTS_PER_PAGE;
+            const pageItems = items.slice(start, start + PRODUCTS_PER_PAGE);
+
+            grid.innerHTML = pageItems.map(renderProductCard).join('') +
+                renderPagination(pageNum, totalPages, urlParams);
+        }
+
+        renderProducts(filteredProducts, currentPage);
+
+        const sortSelect = document.getElementById('sort-by');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function (e) {
+                const sortBy = e.target.value;
+                const sorted = filteredProducts.slice();
+                if (sortBy === 'price-asc') {
+                    sorted.sort(function (a, b) { return parsePrice(a.price) - parsePrice(b.price); });
+                } else if (sortBy === 'price-desc') {
+                    sorted.sort(function (a, b) { return parsePrice(b.price) - parsePrice(a.price); });
+                } else if (sortBy === 'name-asc') {
+                    sorted.sort(function (a, b) { return a.name.localeCompare(b.name); });
+                }
+                renderProducts(sorted, 1);
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        const container = document.querySelector('.__inline-61 > .container.py-4');
+        if (!container) return;
+
+        window.initialProductsContainerHTML = container.innerHTML;
+        window.originalUrlSearch = window.location.search;
+
         const grid = document.getElementById('products-grid');
         const titleEl = document.getElementById('page-title');
         if (!grid || !titleEl) return;
@@ -718,84 +894,26 @@
                     return fetch('data/products.json').then(function (r) { return r.json(); });
                 })
         ]).then(function (results) {
-            const categories = results[0];
-            const products = results[1];
+            globalCategories = (results[0] || []).map(function (cat) {
+                return {
+                    id: cat.id,
+                    name: cat.name,
+                    subcategories: cat.subcategories || cat.children || []
+                };
+            });
+            globalProducts = results[1] || [];
+
             const urlParams = new URLSearchParams(window.location.search);
             const productSlug = urlParams.get('product') || urlParams.get('slug');
             if (productSlug) {
-                const product = findProductBySlug(products, productSlug);
+                const product = findProductBySlug(globalProducts, productSlug);
                 if (product) {
-                    renderProductDetail(product, products);
+                    renderProductDetail(product, globalProducts);
                     return;
                 }
             }
 
-            const currentPage = Math.max(1, parseInt(urlParams.get('page') || '1', 10));
-
-            const result = filterProducts(products, categories, urlParams);
-            let filteredProducts = result.filtered;
-            const titleText = result.titleText;
-
-            titleEl.innerText = titleText + ' (' + filteredProducts.length + ')';
-
-            const categoriesContainer = document.getElementById('local-categories-list');
-            if (categoriesContainer) {
-                const activeCatId = urlParams.get('id') || urlParams.get('category');
-                categoriesContainer.innerHTML = categories.map(function (cat) {
-                    const isActive = activeCatId && parseInt(activeCatId, 10) === cat.id;
-                    let html = '<li class="mb-2">' +
-                        '<a href="/products?id=' + cat.id + '&data_from=category&page=1" class="' +
-                        (isActive ? 'text-primary font-weight-bold' : 'text-dark font-weight-bold') + ' d-block">' +
-                        cat.name + '</a>';
-                    if (cat.subcategories.length > 0) {
-                        html += '<ul class="list-unstyled pl-3 mt-1 small">';
-                        html += cat.subcategories.map(function (sub) {
-                            const subActive = activeCatId && parseInt(activeCatId, 10) === sub.id;
-                            return '<li class="mb-1"><a href="/products?id=' + sub.id +
-                                '&data_from=category&page=1" class="' +
-                                (subActive ? 'text-primary' : 'text-muted') + ' d-block">' + sub.name + '</a></li>';
-                        }).join('');
-                        html += '</ul>';
-                    }
-                    html += '</li>';
-                    return html;
-                }).join('');
-            }
-
-            function renderProducts(items, page) {
-                if (items.length === 0) {
-                    grid.innerHTML = '<div class="col-12 text-center py-5">' +
-                        '<img src="images/empty-cart.svg" width="100" class="mb-3">' +
-                        '<p class="text-muted">No products found.</p></div>';
-                    return;
-                }
-
-                const totalPages = Math.ceil(items.length / PRODUCTS_PER_PAGE);
-                const pageNum = Math.min(page, totalPages);
-                const start = (pageNum - 1) * PRODUCTS_PER_PAGE;
-                const pageItems = items.slice(start, start + PRODUCTS_PER_PAGE);
-
-                grid.innerHTML = pageItems.map(renderProductCard).join('') +
-                    renderPagination(pageNum, totalPages, urlParams);
-            }
-
-            renderProducts(filteredProducts, currentPage);
-
-            const sortSelect = document.getElementById('sort-by');
-            if (sortSelect) {
-                sortSelect.addEventListener('change', function (e) {
-                    const sortBy = e.target.value;
-                    const sorted = filteredProducts.slice();
-                    if (sortBy === 'price-asc') {
-                        sorted.sort(function (a, b) { return parsePrice(a.price) - parsePrice(b.price); });
-                    } else if (sortBy === 'price-desc') {
-                        sorted.sort(function (a, b) { return parsePrice(b.price) - parsePrice(a.price); });
-                    } else if (sortBy === 'name-asc') {
-                        sorted.sort(function (a, b) { return a.name.localeCompare(b.name); });
-                    }
-                    renderProducts(sorted, 1);
-                });
-            }
+            setupProductsPage(globalCategories, globalProducts, urlParams);
         }).catch(function (err) {
             console.error('Error loading products:', err);
             grid.innerHTML = '<div class="col-12 text-center py-5 text-danger">Failed to load products.</div>';
