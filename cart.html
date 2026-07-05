@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | AMWAJ ALMSELA</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="css/theme.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/premium-polish.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Cart Styling overrides */
+        .cart-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item:hover {
+            background-color: #fafbfd;
+        }
+
+        .cart-item-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            padding: 8px;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+            padding-left: 20px;
+        }
+
+        .cart-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .cart-item-title:hover {
+            color: #1b7fed;
+        }
+
+        .cart-item-meta {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .quantity-picker {
+            display: flex;
+            align-items: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: #475569;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .quantity-val {
+            width: 40px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .item-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            min-width: 110px;
+            text-align: right;
+        }
+
+        .btn-delete {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #ef4444;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 20px;
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        /* Order Summary Side Card */
+        .summary-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+            position: sticky;
+            top: 24px;
+        }
+
+        .summary-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 16px;
+            color: #0f172a;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .summary-row.total {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 24px;
+        }
+
+        .coupon-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .coupon-input {
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            flex-grow: 1;
+            font-size: 13px;
+        }
+
+        .coupon-btn {
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .empty-state img {
+            width: 140px;
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header bar -->
+    <header class="box-shadow-sm sticky-top bg-white">
+        <div class="topbar-container bg-dark text-white py-2">
+            <div class="container d-flex justify-content-between align-items-center">
+                <span class="small">Amwaj Almesela E-commerce Platform</span>
+                <a href="/admin" class="text-white small text-decoration-none"><i class="fa fa-gears mr-1"></i>Admin Dashboard</a>
+            </div>
+        </div>
+        
+        <div class="container py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Brand logo -->
+                <a href="/home" class="navbar-brand d-flex align-items-center font-weight-bold" style="font-size: 22px; color: #1b7fed;">
+                    <i class="fa fa-cubes mr-2"></i>Amwaj Store
+                </a>
+
+                <!-- Nav options -->
+                <div class="d-flex align-items-center">
+                    <a href="/products" class="btn btn-link text-dark font-weight-semibold mr-3">All Products</a>
+                    
+                    <div id="cart_items">
+                        <a class="navbar-tool-icon-box bg-secondary" href="/cart" style="position: relative;">
+                            <span class="navbar-tool-label" id="header-cart-badge">0</span>
+                            <i class="navbar-tool-icon czi-cart"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-5">
+        <h2 class="mb-4 font-weight-bold">Shopping Cart</h2>
+        
+        <div class="row">
+            <!-- Cart Items Section -->
+            <div class="col-lg-8">
+                <div class="cart-card" id="cart-content">
+                    <!-- Dynamic Cart Items loaded here -->
+                    <div class="text-center py-5">
+                        <i class="fa fa-spinner fa-spin fa-2x text-muted"></i>
+                        <p class="mt-2 text-muted">Resolving cart items...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="summary-card">
+                    <h4 class="summary-title">Order Summary</h4>
+                    
+                    <!-- Voucher apply -->
+                    <div class="coupon-box">
+                        <input type="text" id="coupon-code" class="coupon-input" placeholder="Promo code (e.g. SUMMER10)">
+                        <button class="btn btn-outline-primary coupon-btn" id="btn-apply-coupon">Apply</button>
+                    </div>
+                    <div id="coupon-alert" class="small mb-3" style="display: none;"></div>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">QAR 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping Cost</span>
+                        <span id="summary-shipping">QAR 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>VAT (5%)</span>
+                        <span id="summary-tax">QAR 0.00</span>
+                    </div>
+                    <div class="summary-row text-success" id="summary-discount-row" style="display: none;">
+                        <span>Voucher Discount</span>
+                        <span id="summary-discount">-QAR 0.00</span>
+                    </div>
+                    
+                    <div class="summary-row total">
+                        <span>Order Total</span>
+                        <span id="summary-total">QAR 0.00</span>
+                    </div>
+
+                    <button class="btn btn-primary checkout-btn" id="btn-proceed-checkout" disabled>
+                        Proceed to Checkout <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0 small">Copyright &copy; 2026 Amwaj Almesela. All Rights Reserved.</p>
+            <div class="mt-2">
+                <a href="#" class="text-white-50 mx-2 small text-decoration-none">Terms & Conditions</a>
+                <a href="#" class="text-white-50 mx-2 small text-decoration-none">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/jquery-2.2.4.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/local-cart-wishlist.js"></script>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api/v1';
+        let appliedCoupon = null;
+        let cartProducts = []; // Details of resolved items
+
+        $(document).ready(function() {
+            loadCartItems();
+
+            $('#btn-apply-coupon').on('click', applyCoupon);
+            $('#btn-proceed-checkout').on('click', proceedToCheckout);
+        });
+
+        // 1. Fetch details of all items in cart
+        function loadCartItems() {
+            const cart = getCart();
+            if (cart.length === 0) {
+                renderEmptyCart();
+                return;
+            }
+
+            // Fetch products from database to get live name, price, stock levels, and images
+            $.ajax({
+                url: `${API_BASE}/products?limit=100`,
+                success: function(res) {
+                    const productsList = res.data;
+                    renderCartList(cart, productsList);
+                },
+                error: function() {
+                    // Fail-safe: Use static JSON products from memory
+                    if (window.localProducts) {
+                        renderCartList(cart, window.localProducts);
+                    } else {
+                        $('#cart-content').html(`
+                            <div class="p-4 text-center text-danger">
+                                <i class="fa fa-exclamation-triangle fa-2x"></i>
+                                <p class="mt-2">Failed to load product catalog. Please try again.</p>
+                            </div>
+                        `);
+                    }
+                }
+            });
+        }
+
+        // Helper to get local storage cart
+        function getCart() {
+            return JSON.parse(localStorage.getItem('local_cart') || '[]');
+        }
+
+        // Helper to save local storage cart
+        function saveCart(cart) {
+            localStorage.setItem('local_cart', JSON.stringify(cart));
+            // Trigger navigation badge updates
+            if (window.updateNavCart) window.updateNavCart();
+            updateHeaderBadge();
+        }
+
+        function updateHeaderBadge() {
+            const cart = getCart();
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            $('#header-cart-badge').text(totalCount);
+        }
+
+        function renderEmptyCart() {
+            $('#cart-content').html(`
+                <div class="empty-state">
+                    <img src="images/image-place-holder.png" alt="Empty Cart" onerror="this.src='images/image-place-holder.png'">
+                    <h4 class="font-weight-bold text-dark">Your Cart is Empty</h4>
+                    <p class="text-muted mb-4">Add products to your cart to continue shopping.</p>
+                    <a href="/products" class="btn btn-primary __rounded-10">Explore Catalog</a>
+                </div>
+            `);
+            $('#btn-proceed-checkout').prop('disabled', true);
+            updateSummary(0);
+            updateHeaderBadge();
+        }
+
+        function renderCartList(cart, productsList) {
+            cartProducts = [];
+            let html = '';
+            
+            cart.forEach(item => {
+                const prod = productsList.find(p => p.id === parseInt(item.id, 10) || p.slug === item.id);
+                if (prod) {
+                    const qty = item.qty;
+                    const priceVal = parseFloat(prod.price) || parseFloat(String(prod.price).replace(/[^\d\.]/g, '')) || 0;
+                    const img = prod.images && prod.images.length > 0 ? prod.images[0].url : (prod.image || 'images/image-place-holder.png');
+                    
+                    cartProducts.push({
+                        id: prod.id,
+                        name: prod.name,
+                        price: priceVal,
+                        image: img,
+                        qty: qty,
+                        sku: prod.sku || 'N/A'
+                    });
+
+                    html += `
+                        <div class="cart-item" id="item-row-${prod.id}">
+                            <img src="${img}" class="cart-item-img" onerror="this.src='images/image-place-holder.png'">
+                            <div class="cart-item-info">
+                                <a href="/product?product=${prod.slug || prod.id}" class="cart-item-title">${prod.name}</a>
+                                <div class="cart-item-meta">SKU: <code>${prod.sku || 'N/A'}</code></div>
+                                <div class="cart-item-meta text-primary font-weight-bold mt-1">QAR ${priceVal.toFixed(2)}</div>
+                            </div>
+                            <div class="mr-4">
+                                <div class="quantity-picker">
+                                    <button class="quantity-btn" onclick="adjustQty(${prod.id}, -1)">-</button>
+                                    <input type="text" class="quantity-val" id="qty-val-${prod.id}" value="${qty}">
+                                    <button class="quantity-btn" onclick="adjustQty(${prod.id}, 1)">+</button>
+                                </div>
+                            </div>
+                            <div class="item-price" id="price-total-${prod.id}">QAR ${(priceVal * qty).toFixed(2)}</div>
+                            <button class="btn-delete" onclick="removeItem(${prod.id})" title="Remove item"><i class="fa fa-trash"></i></button>
+                        </div>
+                    `;
+                }
+            });
+
+            if (cartProducts.length === 0) {
+                renderEmptyCart();
+                return;
+            }
+
+            $('#cart-content').html(html);
+            $('#btn-proceed-checkout').prop('disabled', false);
+            calculateTotals();
+            updateHeaderBadge();
+        }
+
+        // 2. Adjust item quantity
+        window.adjustQty = function(productId, direction) {
+            let cart = getCart();
+            const item = cart.find(i => i.id === productId || String(i.id) === String(productId));
+            if (!item) return;
+
+            item.qty += direction;
+            if (item.qty <= 0) {
+                removeItem(productId);
+                return;
+            }
+
+            // Update DOM and local storage
+            $(`#qty-val-${productId}`).val(item.qty);
+            const resolved = cartProducts.find(p => p.id === productId);
+            if (resolved) {
+                resolved.qty = item.qty;
+                $(`#price-total-${productId}`).text(`QAR ${(resolved.price * item.qty).toFixed(2)}`);
+            }
+
+            saveCart(cart);
+            calculateTotals();
+        };
+
+        // 3. Delete item from cart
+        window.removeItem = function(productId) {
+            let cart = getCart();
+            cart = cart.filter(i => i.id !== productId && String(i.id) !== String(productId));
+            
+            saveCart(cart);
+            $(`#item-row-${productId}`).slideUp(300, function() {
+                $(this).remove();
+                if (cart.length === 0) {
+                    renderEmptyCart();
+                } else {
+                    cartProducts = cartProducts.filter(p => p.id !== productId);
+                    calculateTotals();
+                }
+            });
+        };
+
+        // 4. Calculate prices
+        function calculateTotals() {
+            let subtotal = 0;
+            cartProducts.forEach(p => {
+                subtotal += p.price * p.qty;
+            });
+            updateSummary(subtotal);
+        }
+
+        function updateSummary(subtotal) {
+            // Free shipping on order values over 300 QAR
+            const shipping = subtotal > 300 || subtotal === 0 ? 0.0 : 15.0;
+            const tax = subtotal * 0.05;
+            
+            let discount = 0;
+            if (appliedCoupon && subtotal > 0) {
+                if (subtotal >= appliedCoupon.min_order) {
+                    if (appliedCoupon.type === 'percentage') {
+                        discount = subtotal * (parseFloat(appliedCoupon.value) / 100);
+                    } else {
+                        discount = parseFloat(appliedCoupon.value);
+                    }
+                } else {
+                    // Minimum order not met anymore
+                    appliedCoupon = null;
+                    $('#coupon-alert').text(`Coupon removed: Requires min QAR ${appliedCoupon.min_order} order`).addClass('text-danger').removeClass('text-success').show();
+                    $('#summary-discount-row').hide();
+                }
+            }
+
+            const total = Math.max(0, subtotal + shipping + tax - discount);
+
+            $('#summary-subtotal').text(`QAR ${subtotal.toFixed(2)}`);
+            $('#summary-shipping').text(shipping === 0 ? 'Free' : `QAR ${shipping.toFixed(2)}`);
+            $('#summary-tax').text(`QAR ${tax.toFixed(2)}`);
+            
+            if (discount > 0) {
+                $('#summary-discount').text(`-QAR ${discount.toFixed(2)}`);
+                $('#summary-discount-row').show();
+            } else {
+                $('#summary-discount-row').hide();
+            }
+
+            $('#summary-total').text(`QAR ${total.toFixed(2)}`);
+
+            // Save summary calculations to session for Checkout use
+            sessionStorage.setItem('checkout_summary', JSON.stringify({
+                subtotal: subtotal,
+                shipping: shipping,
+                tax: tax,
+                discount: discount,
+                total: total,
+                coupon_code: appliedCoupon ? appliedCoupon.code : null
+            }));
+        }
+
+        // 5. Apply Promo Codes
+        function applyCoupon() {
+            const code = $('#coupon-code').val().trim().toUpperCase();
+            if (!code) {
+                showAlertCoupon('Please enter a voucher code', 'danger');
+                return;
+            }
+
+            // Call backend to validate coupon
+            $.ajax({
+                url: `${API_BASE}/coupons/admin/list`,
+                success: function(res) {
+                    const coupon = res.data.find(c => c.code.toUpperCase() === code);
+                    if (!coupon) {
+                        showAlertCoupon('Invalid coupon code.', 'danger');
+                        return;
+                    }
+
+                    // Check minimum order criteria
+                    const subtotal = cartProducts.reduce((sum, p) => sum + (p.price * p.qty), 0);
+                    if (subtotal < parseFloat(coupon.min_order)) {
+                        showAlertCoupon(`Minimum order of QAR ${parseFloat(coupon.min_order).toFixed(2)} required.`, 'danger');
+                        return;
+                    }
+
+                    appliedCoupon = coupon;
+                    showAlertCoupon(`Coupon applied! Discount: ${coupon.type === 'percentage' ? coupon.value + '%' : 'QAR ' + coupon.value}`, 'success');
+                    calculateTotals();
+                },
+                error: function() {
+                    showAlertCoupon('Failed to validate voucher. Try again.', 'danger');
+                }
+            });
+        }
+
+        function showAlertCoupon(msg, type) {
+            $('#coupon-alert')
+                .text(msg)
+                .removeClass('text-success text-danger')
+                .addClass(type === 'success' ? 'text-success' : 'text-danger')
+                .show();
+        }
+
+        // 6. Proceed
+        function proceedToCheckout() {
+            // Check if logged in, otherwise prompt sign in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please sign in to complete your checkout.');
+                // Open storefront user login modal (simulated click on header sign-in if present)
+                if (window.openAuthModal) {
+                    window.openAuthModal();
+                } else {
+                    // Fallback to alert details
+                    alert('You can log in or register via the Account link in the top bar.');
+                }
+                return;
+            }
+
+            // Redirect to checkout
+            window.location.href = '/checkout';
+        }
+    </script>
+    <script src="js/premium-interactions.js"></script>
+</body>
+</html>

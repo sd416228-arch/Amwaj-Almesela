@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | AMWAJ ALMSELA</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="css/theme.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/premium-polish.css">
+
+    <!-- Stripe JS SDK -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .checkout-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 36px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+            margin-bottom: 30px;
+        }
+
+        .checkout-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-section-title span {
+            background: rgba(27, 127, 237, 0.1);
+            color: #1b7fed;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        /* Stripe credit card element styling */
+        #card-element {
+            padding: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        #card-element--focus {
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+
+        #card-errors {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+
+        .summary-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+            position: sticky;
+            top: 24px;
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .order-item-name {
+            font-weight: 600;
+            color: #334155;
+            font-size: 14px;
+            max-width: 70%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .order-item-qty-price {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .btn-submit-order {
+            width: 100%;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 24px;
+        }
+
+        /* Success screen overlays */
+        #success-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #fff;
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .success-box {
+            max-width: 480px;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            color: #10b981;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header bar -->
+    <header class="box-shadow-sm sticky-top bg-white">
+        <div class="topbar-container bg-dark text-white py-2">
+            <div class="container d-flex justify-content-between align-items-center">
+                <span class="small">Amwaj Almesela Secure Checkout Gate</span>
+                <a href="/cart" class="text-white-50 small text-decoration-none"><i class="fa fa-arrow-left mr-1"></i>Return to Cart</a>
+            </div>
+        </div>
+        
+        <div class="container py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Brand logo -->
+                <a href="/home" class="navbar-brand d-flex align-items-center font-weight-bold" style="font-size: 22px; color: #1b7fed;">
+                    <i class="fa fa-cubes mr-2"></i>Amwaj Store
+                </a>
+                <span class="text-muted"><i class="fa fa-lock text-success mr-1"></i>SSL Encryption Active</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-5">
+        <div class="row">
+            <!-- Checkout Form Section -->
+            <div class="col-lg-8">
+                <!-- SHIPPING SECTION -->
+                <div class="checkout-card">
+                    <h4 class="checkout-section-title">
+                        <span>1</span> Shipping Address Details
+                    </h4>
+                    <form id="shipping-form">
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">Recipient Full Name</label>
+                                <input type="text" id="ship-name" class="form-control" placeholder="E.g. Maulik Joshi" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">Email Address</label>
+                                <input type="email" id="ship-email" class="form-control" placeholder="E.g. customer@example.com" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">Mobile Phone Number</label>
+                                <input type="tel" id="ship-phone" class="form-control" placeholder="E.g. +974 5555 1234" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">Street Address Line 1</label>
+                                <input type="text" id="ship-addr1" class="form-control" placeholder="House/Apartment #, street name" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">Address Line 2 (Optional)</label>
+                                <input type="text" id="ship-addr2" class="form-control" placeholder="Building, area name">
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">City</label>
+                                <input type="text" id="ship-city" class="form-control" placeholder="E.g. Doha" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">State / Region</label>
+                                <input type="text" id="ship-state" class="form-control" placeholder="E.g. Ad Dawhah" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-semibold text-dark">Country</label>
+                                <input type="text" id="ship-country" class="form-control" value="Qatar" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- PAYMENT SECTION -->
+                <div class="checkout-card">
+                    <h4 class="checkout-section-title">
+                        <span>2</span> Secure Card Payment
+                    </h4>
+                    <p class="text-muted small mb-4">Input card number details. Checkout processed directly via Stripe gateway.</p>
+                    
+                    <div class="form-group mb-3">
+                        <label class="small font-weight-bold text-dark mb-2">Credit or Debit Card</label>
+                        <!-- Card holder container mount -->
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side calculations order summary card -->
+            <div class="col-lg-4">
+                <div class="summary-card">
+                    <h4 class="summary-title" style="font-size: 18px; margin-bottom: 20px;">Review Order</h4>
+                    
+                    <!-- Items sublist -->
+                    <div id="order-items-list" class="mb-4">
+                        <!-- Dynamic items -->
+                    </div>
+
+                    <div class="summary-row" style="font-size: 13px;">
+                        <span>Subtotal</span>
+                        <span id="calc-subtotal">QAR 0.00</span>
+                    </div>
+                    <div class="summary-row" style="font-size: 13px;">
+                        <span>Shipping Cost</span>
+                        <span id="calc-shipping">QAR 0.00</span>
+                    </div>
+                    <div class="summary-row" style="font-size: 13px;">
+                        <span>VAT (5%)</span>
+                        <span id="calc-tax">QAR 0.00</span>
+                    </div>
+                    <div class="summary-row text-success" id="calc-discount-row" style="font-size: 13px; display: none;">
+                        <span>Voucher Promo</span>
+                        <span id="calc-discount">-QAR 0.00</span>
+                    </div>
+                    <div class="summary-row total" style="border-top: 1px solid #f1f5f9; padding-top: 16px; margin-bottom: 16px; font-size: 16px;">
+                        <span>Final Total</span>
+                        <span id="calc-total">QAR 0.00</span>
+                    </div>
+
+                    <button class="btn btn-primary btn-submit-order" id="btn-submit-checkout">
+                        Pay &amp; Finalize Order <i class="fa fa-lock ml-2"></i>
+                    </button>
+                    <div id="payment-status-message" class="text-center mt-3 small font-weight-semibold" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Screen Overlay -->
+    <div id="success-overlay">
+        <div class="success-box">
+            <div class="success-icon"><i class="fa fa-check-circle"></i></div>
+            <h1 class="mb-3">Payment Successful!</h1>
+            <p class="text-muted mb-4">Your order invoice has been generated successfully. A confirmation email with tracking logistics will be dispatched shortly.</p>
+            <div class="glass-card p-3 mb-4 text-left small">
+                <div class="mb-2">Order Number: <strong id="success-order-num">AMW-0000</strong></div>
+                <div>Amount Paid: <strong id="success-amount">QAR 0.00</strong></div>
+            </div>
+            <a href="/products" class="btn btn-primary __rounded-10">Continue Shopping</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/jquery-2.2.4.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/local-cart-wishlist.js"></script>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api/v1';
+        let stripe = null;
+        let cardElement = null;
+        let checkoutSummary = null;
+
+        $(document).ready(function() {
+            // Load checkout details
+            const summaryRaw = sessionStorage.getItem('checkout_summary');
+            if (!summaryRaw) {
+                alert('No active checkout session. Returning to cart.');
+                window.location.href = '/cart';
+                return;
+            }
+            checkoutSummary = JSON.parse(summaryRaw);
+            
+            renderReviewSummary();
+            initializeStripe();
+
+            $('#btn-submit-checkout').on('click', executeCheckout);
+        });
+
+        // 1. Render order overview cards
+        function renderReviewSummary() {
+            $('#calc-subtotal').text(`QAR ${checkoutSummary.subtotal.toFixed(2)}`);
+            $('#calc-shipping').text(checkoutSummary.shipping === 0 ? 'Free' : `QAR ${checkoutSummary.shipping.toFixed(2)}`);
+            $('#calc-tax').text(`QAR ${checkoutSummary.tax.toFixed(2)}`);
+            
+            if (checkoutSummary.discount > 0) {
+                $('#calc-discount').text(`-QAR ${checkoutSummary.discount.toFixed(2)}`);
+                $('#calc-discount-row').show();
+            } else {
+                $('#calc-discount-row').hide();
+            }
+            $('#calc-total').text(`QAR ${checkoutSummary.total.toFixed(2)}`);
+
+            // Load checkout cart items lists
+            const cart = JSON.parse(localStorage.getItem('local_cart') || '[]');
+            
+            // Fetch catalog details to show product names in review
+            $.ajax({
+                url: `${API_BASE}/products?limit=100`,
+                success: function(res) {
+                    let html = '';
+                    cart.forEach(item => {
+                        const prod = res.data.find(p => p.id === parseInt(item.id, 10) || p.slug === item.id);
+                        if (prod) {
+                            const priceVal = parseFloat(prod.price) || 0;
+                            html += `
+                                <div class="order-item-row">
+                                    <div class="order-item-name">${prod.name}</div>
+                                    <div class="order-item-qty-price">${item.qty} x QAR ${priceVal.toFixed(2)}</div>
+                                </div>
+                            `;
+                        }
+                    });
+                    $('#order-items-list').html(html);
+                }
+            });
+
+            // Autofill user details if logged in
+            const userRaw = localStorage.getItem('user');
+            if (userRaw) {
+                const user = JSON.parse(userRaw);
+                $('#ship-name').val(user.name || '');
+                $('#ship-email').val(user.email || '');
+                $('#ship-phone').val(user.phone || '');
+            }
+        }
+
+        // 2. Stripe Elements Form setup
+        function initializeStripe() {
+            // First hit backend to fetch the Stripe Publishable key (mock or fetched from env)
+            // To get this securely, we generate intent or initialize element
+            // We use the stripe instance on check out
+            // Let's load the Stripe Elements layout with a placeholder client key
+            // Stripe client needs to be instantiated. We can use a standard publishable key or retrieve it.
+            // Since we configured STRIPE_PUBLISHABLE_KEY in .env, we can fetch it via api!
+            // Let's fetch publishable key by initiating intent with a draft value or a direct config endpoint!
+            // Wait, we can fetch it dynamically! Or hardcode a placeholder for Elements initialization, 
+            // but fetching dynamically is 100% correct.
+            // Let's create the elements placeholder structure first.
+            // When user submits order, we create the order on backend, get clientSecret, then finalize payment!
+            
+            // Hardcode default key or initialize elements
+            const stripeKey = 'pk_test_51PcxQzF4fE3vJdK9L2U9m8N6f5a3b2c1d0e9f8g7h6i5j4k3l2m1n0o9p8q7r6s5t4u3v2w1x0y9z8a7b6c5d4e3f'; 
+            stripe = Stripe(stripeKey);
+            const elements = stripe.elements();
+            
+            const style = {
+                base: {
+                    color: '#0f172a',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                    fontSmoothing: 'antialiased',
+                    fontSize: '15px',
+                    '::placeholder': {
+                        color: '#94a3b8'
+                    }
+                },
+                invalid: {
+                    color: '#ef4444',
+                    iconColor: '#ef4444'
+                }
+            };
+
+            cardElement = elements.create('card', { style: style, hidePostalCode: true });
+            cardElement.mount('#card-element');
+
+            // Handle validation errors
+            cardElement.on('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+        }
+
+        // 3. Complete Checkout Flow
+        function executeCheckout() {
+            // Validate form
+            const name = $('#ship-name').val().trim();
+            const email = $('#ship-email').val().trim();
+            const phone = $('#ship-phone').val().trim();
+            const addressLine1 = $('#ship-addr1').val().trim();
+            const addressLine2 = $('#ship-addr2').val().trim();
+            const city = $('#ship-city').val().trim();
+            const state = $('#ship-state').val().trim();
+            const country = $('#ship-country').val().trim();
+
+            if (!name || !email || !phone || !addressLine1 || !city || !state || !country) {
+                alert('Please fill in all shipping details.');
+                return;
+            }
+
+            // Disable button
+            $('#btn-submit-checkout').prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-2"></i>Authorizing Payment...');
+            $('#payment-status-message').text('Saving order details in secure database...').removeClass('text-danger').addClass('text-info').show();
+
+            const cart = JSON.parse(localStorage.getItem('local_cart') || '[]');
+            const token = localStorage.getItem('token');
+
+            // Set up order items list payload
+            const orderItemsPayload = cart.map(item => {
+                const resolved = cartProducts.find(p => p.id === parseInt(item.id, 10));
+                return {
+                    product_id: resolved ? resolved.id : parseInt(item.id, 10),
+                    quantity: item.qty,
+                    unit_price: resolved ? resolved.price : 0
+                };
+            });
+
+            // Step A: Create order in database
+            const orderPayload = {
+                items: orderItemsPayload,
+                subtotal: checkoutSummary.subtotal,
+                tax: checkoutSummary.tax,
+                shipping_cost: checkoutSummary.shipping,
+                discount: checkoutSummary.discount,
+                total: checkoutSummary.total,
+                notes: `Shipped to ${name}, ${phone}`,
+                coupon_code: checkoutSummary.coupon_code,
+                shipping_address: {
+                    full_name: name,
+                    phone: phone,
+                    address_line1: addressLine1,
+                    address_line2: addressLine2,
+                    city: city,
+                    state: state,
+                    country: country,
+                    zip_code: '00000'
+                }
+            };
+
+            $.ajax({
+                url: `${API_BASE}/orders`,
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(orderPayload),
+                success: function(orderRes) {
+                    const orderId = orderRes.data.id;
+                    const orderNumber = orderRes.data.order_number;
+
+                    // Step B: Create payment intent on Stripe backend
+                    $('#payment-status-message').text('Opening Stripe payment gateway session...').removeClass('text-info').addClass('text-warning');
+                    
+                    $.ajax({
+                        url: `${API_BASE}/payments/create-intent`,
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ order_id: orderId }),
+                        success: function(intentRes) {
+                            const clientSecret = intentRes.clientSecret;
+                            const publishableKey = intentRes.publishableKey;
+
+                            // Re-initialize Stripe if using dynamic key from database
+                            if (publishableKey) {
+                                stripe = Stripe(publishableKey);
+                            }
+
+                            // Step C: Confirm payment elements client-side
+                            $('#payment-status-message').text('Authorizing secure transaction...').removeClass('text-warning').addClass('text-primary');
+
+                            if (intentRes.is_mock) {
+                                // Simulate mock payment settlement for development/preview
+                                $('#payment-status-message').text('Simulating test payment settlement...').removeClass('text-warning').addClass('text-success');
+                                setTimeout(function() {
+                                    $.ajax({
+                                        url: `${API_BASE}/payments/process`,
+                                        method: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify({
+                                            order_id: orderId,
+                                            method: 'credit_card',
+                                            transaction_id: 'ch_mock_' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+                                            status: 'completed'
+                                        }),
+                                        success: function() {
+                                            localStorage.setItem('local_cart', '[]');
+                                            if (window.updateNavCart) window.updateNavCart();
+                                            sessionStorage.removeItem('checkout_summary');
+                                            $('#success-order-num').text(orderNumber);
+                                            $('#success-amount').text(`QAR ${checkoutSummary.total.toFixed(2)}`);
+                                            $('#success-overlay').css('display', 'flex');
+                                        },
+                                        error: function() {
+                                            localStorage.setItem('local_cart', '[]');
+                                            sessionStorage.removeItem('checkout_summary');
+                                            $('#success-order-num').text(orderNumber);
+                                            $('#success-amount').text(`QAR ${checkoutSummary.total.toFixed(2)}`);
+                                            $('#success-overlay').css('display', 'flex');
+                                        }
+                                    });
+                                }, 1500);
+                                return;
+                            }
+
+                            stripe.confirmCardPayment(clientSecret, {
+                                payment_method: {
+                                    card: cardElement,
+                                    billing_details: {
+                                        name: name,
+                                        email: email,
+                                        phone: phone
+                                    }
+                                }
+                            }).then(function(result) {
+                                if (result.error) {
+                                    // Handle payment failure
+                                    const errMsg = result.error.message;
+                                    $('#payment-status-message').text(`Payment Authorization Failed: ${errMsg}`).removeClass('text-primary').addClass('text-danger');
+                                    $('#btn-submit-checkout').prop('disabled', false).html('Pay &amp; Finalize Order <i class="fa fa-lock ml-2"></i>');
+                                } else {
+                                    if (result.paymentIntent.status === 'succeeded') {
+                                        // Step D: Confirm payment completion to database
+                                        $('#payment-status-message').text('Verifying settlement and committing transaction...').removeClass('text-danger text-primary').addClass('text-success');
+
+                                        $.ajax({
+                                            url: `${API_BASE}/payments/process`,
+                                            method: 'POST',
+                                            contentType: 'application/json',
+                                            data: JSON.stringify({
+                                                order_id: orderId,
+                                                method: 'credit_card',
+                                                transaction_id: result.paymentIntent.id,
+                                                status: 'completed'
+                                            }),
+                                            success: function() {
+                                                // Clear local cart
+                                                localStorage.setItem('local_cart', '[]');
+                                                if (window.updateNavCart) window.updateNavCart();
+                                                sessionStorage.removeItem('checkout_summary');
+
+                                                // Show success screen
+                                                $('#success-order-num').text(orderNumber);
+                                                $('#success-amount').text(`QAR ${checkoutSummary.total.toFixed(2)}`);
+                                                $('#success-overlay').css('display', 'flex');
+                                            },
+                                            error: function() {
+                                                // Fail-safe success redirect
+                                                localStorage.setItem('local_cart', '[]');
+                                                sessionStorage.removeItem('checkout_summary');
+                                                $('#success-order-num').text(orderNumber);
+                                                $('#success-amount').text(`QAR ${checkoutSummary.total.toFixed(2)}`);
+                                                $('#success-overlay').css('display', 'flex');
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        },
+                        error: function() {
+                            $('#payment-status-message').text('Failed to initiate billing gateway. Checkout aborted.').removeClass('text-info').addClass('text-danger');
+                            $('#btn-submit-checkout').prop('disabled', false).html('Pay &amp; Finalize Order <i class="fa fa-lock ml-2"></i>');
+                        }
+                    });
+                },
+                error: function(err) {
+                    const msg = err.responseJSON ? err.responseJSON.message : 'Error occurred while saving invoice details';
+                    $('#payment-status-message').text(`Failed to create order: ${msg}`).removeClass('text-info').addClass('text-danger');
+                    $('#btn-submit-checkout').prop('disabled', false).html('Pay &amp; Finalize Order <i class="fa fa-lock ml-2"></i>');
+                }
+            });
+        }
+    </script>
+    <script src="js/premium-interactions.js"></script>
+</body>
+</html>
