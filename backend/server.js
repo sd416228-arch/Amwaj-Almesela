@@ -119,10 +119,6 @@ app.get('/checkout', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'checkout.html'));
 });
 
-app.get('/sellers', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'sellers.html'));
-});
-
 // Root fallback redirects to /home
 app.get('/', (req, res) => {
     res.redirect('/home');
