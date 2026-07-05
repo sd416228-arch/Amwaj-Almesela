@@ -484,19 +484,33 @@
                                     </button>
                                 </div>
                                 <div class="modal-body p-4">
-                                    <ul class="nav nav-tabs border-bottom mb-4" role="tablist" style="border-color: #f1f5f9 !important;">
-                                        <li class="nav-item" style="width: 50%;">
-                                            <a class="nav-link active font-weight-bold text-center border-0" data-toggle="tab" href="#modal-login-tab" role="tab" style="font-family: var(--font-heading); border-bottom: 2px solid transparent !important; color: #64748b; padding-bottom: 12px;">Sign In</a>
+                                    <ul class="nav nav-tabs border-bottom mb-4" role="tablist" style="border-color: #f1f5f9 !important; display: flex !important; flex-direction: row !important; width: 100% !important; padding: 0 !important; margin: 0 0 24px 0 !important; list-style: none !important;">
+                                        <li class="nav-item" style="width: 50% !important; display: list-item !important;">
+                                            <a class="nav-link active font-weight-bold text-center border-0" data-toggle="tab" href="#modal-login-tab" role="tab" style="font-family: var(--font-heading); display: block !important; padding: 12px 0 !important; text-align: center !important;">Sign In</a>
                                         </li>
-                                        <li class="nav-item" style="width: 50%;">
-                                            <a class="nav-link font-weight-bold text-center border-0" data-toggle="tab" href="#modal-register-tab" role="tab" style="font-family: var(--font-heading); border-bottom: 2px solid transparent !important; color: #64748b; padding-bottom: 12px;">Sign Up</a>
+                                        <li class="nav-item" style="width: 50% !important; display: list-item !important;">
+                                            <a class="nav-link font-weight-bold text-center border-0" data-toggle="tab" href="#modal-register-tab" role="tab" style="font-family: var(--font-heading); display: block !important; padding: 12px 0 !important; text-align: center !important;">Sign Up</a>
                                         </li>
                                     </ul>
                                     <style>
-                                        #loginModal .nav-tabs .nav-link.active {
-                                            color: var(--primary-color) !important;
-                                            border-bottom: 2px solid var(--primary-color) !important;
+                                        #loginModal .nav-tabs .nav-link {
+                                            color: #475569 !important;
                                             background: transparent !important;
+                                            border: none !important;
+                                            font-size: 16px !important;
+                                            opacity: 0.65 !important;
+                                            transition: all 0.2s ease !important;
+                                            text-decoration: none !important;
+                                            border-bottom: 2px solid transparent !important;
+                                        }
+                                        #loginModal .nav-tabs .nav-link:hover {
+                                            opacity: 1 !important;
+                                            color: #1b7fed !important;
+                                        }
+                                        #loginModal .nav-tabs .nav-link.active {
+                                            color: #1b7fed !important;
+                                            border-bottom: 2px solid #1b7fed !important;
+                                            opacity: 1 !important;
                                         }
                                         #loginModal .form-control {
                                             border-radius: 10px !important;
@@ -505,8 +519,8 @@
                                             font-size: 14px !important;
                                         }
                                         #loginModal .form-control:focus {
-                                            border-color: var(--primary-color) !important;
-                                            box-shadow: 0 0 0 3px var(--primary-glow) !important;
+                                            border-color: #1b7fed !important;
+                                            box-shadow: 0 0 0 3px rgba(27, 127, 237, 0.15) !important;
                                         }
                                     </style>
                                     <div class="tab-content pt-1">
